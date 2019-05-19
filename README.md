@@ -1,7 +1,7 @@
 NAME
 ====
 
-Terminal::QuickCharts - blah blah blah
+Terminal::QuickCharts - Simple charts for CLI tools
 
 SYNOPSIS
 ========
@@ -13,7 +13,7 @@ use Terminal::QuickCharts;
 DESCRIPTION
 ===========
 
-Terminal::QuickCharts is ...
+Terminal::QuickCharts provides a small library of simple text-output charts, suitable for spruicing up command-line reporting and quick analysis tools. The emphasis here is more on whipuptitude, and less on manipulexity.
 
 AUTHOR
 ======

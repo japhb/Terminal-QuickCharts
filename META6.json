@@ -3,8 +3,10 @@
     "Geoffrey Broadwell"
   ],
   "build-depends" : [ ],
-  "depends" : [ ],
-  "description" : "blah blah blah",
+  "depends" : [
+    "Terminal::ANSIColor"
+  ],
+  "description" : "Simple charts for CLI tools",
   "license" : "Artistic-2.0",
   "name" : "Terminal::QuickCharts",
   "perl" : "6.c",

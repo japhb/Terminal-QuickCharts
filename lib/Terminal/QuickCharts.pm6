@@ -6,7 +6,7 @@ unit class Terminal::QuickCharts:ver<0.0.1>;
 
 =head1 NAME
 
-Terminal::QuickCharts - blah blah blah
+Terminal::QuickCharts - Simple charts for CLI tools
 
 =head1 SYNOPSIS
 
@@ -18,7 +18,9 @@ use Terminal::QuickCharts;
 
 =head1 DESCRIPTION
 
-Terminal::QuickCharts is ...
+Terminal::QuickCharts provides a small library of simple text-output charts,
+suitable for spruicing up command-line reporting and quick analysis tools.  The
+emphasis here is more on whipuptitude, and less on manipulexity.
 
 =head1 AUTHOR
 
