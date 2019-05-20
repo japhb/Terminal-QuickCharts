@@ -4,7 +4,7 @@ unit module Terminal::QuickCharts:ver<0.0.1>;
 use Terminal::ANSIColor;
 
 
-sub screen-height() {
+sub screen-height(--> UInt:D) {
     if ::("Terminal::Print") -> \TP {
         TP.new.rows
     }
@@ -25,16 +25,16 @@ sub pick-color($color-rule, $item) {
 }
 
 
-multi colorize($text, $color) {
+multi colorize(Str:D $text, $color --> Str:D) {
     $color ?? colored($text, $color) !! $text
 }
 
-multi colorize($text, $color-rule, $item) {
+multi colorize(Str:D $text, $color-rule, $item --> Str:D) {
     colorize($text, pick-color($color-rule, $item))
 }
 
 
-sub hpad(Int $pad-length, UInt :$lines-every, UInt :$pos = 0) {
+sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) {
     return '' unless $pad-length > 0;
 
     my $pad = ' ' x $pad-length;
@@ -50,9 +50,9 @@ sub hpad(Int $pad-length, UInt :$lines-every, UInt :$pos = 0) {
 }
 
 
-sub hbar(Real $value, :$color, UInt :$lines-every,
-         Real :$min!, Real :$max! where $max > $min,
-         UInt :$width! where * > 0) is export {
+sub hbar(Real:D $value, :$color, UInt :$lines-every,
+         Real:D :$min!, Real:D :$max! where $max > $min,
+         UInt:D :$width! where * > 0 --> Str:D) is export {
 
     return ' ' x $width if $value <= $min;
     return '█' x $width if $value >= $max;
@@ -73,8 +73,8 @@ sub hbar(Real $value, :$color, UInt :$lines-every,
 #| be padded out to $width, optionally with chart lines drawn at an interval of
 #| $lines-every.  Bar segments will be colored in order of @colors.
 sub stacked-hbar(@values, :@colors, UInt :$lines-every,
-                 Real :$min!, Real :$max! where $max > $min,
-                 UInt :$width! where * > 0) is export {
+                 Real:D :$min!, Real:D :$max! where $max > $min,
+                 UInt:D :$width! where * > 0 --> Str:D) is export {
 
     my $cell      = ($max - $min) / $width;
     my $old-val   = $min;
@@ -144,8 +144,8 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
 
 
 sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
-               Real :$min!, Real :$max! where $max > $min,
-               UInt :$width! where * > 0, UInt :$bar-spacing = 0) is export {
+               Real:D :$min!, Real:D :$max! where $max > $min,
+               UInt:D :$width! where * > 0, UInt :$bar-spacing = 0) is export {
 
     return unless @data;
 
@@ -193,7 +193,7 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
 }
 
 
-sub area-graph(@data, Real :$row-delta!, :$color, UInt :$lines-every,
+sub area-graph(@data, Real:D :$row-delta!, :$color, UInt :$lines-every,
                UInt :$max-height = screen-height, UInt :$min-height = 1) is export {
 
     my $max  = @data.max;
