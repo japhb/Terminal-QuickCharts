@@ -73,6 +73,10 @@ sub hbars(@values, Real :$min!, Real :$max! where $max > $min,
 }
 
 
+#| Render a single stacked horizontal bar (presumably from a bar chart).  $min
+#| is the value at the left end, and $max the value at the right. The bar will
+#| be padded out to $width, optionally with chart lines drawn at an interval of
+#| $lines-every.  Bar segments will be colored in order of @colors.
 sub stacked-hbar(@values, :@colors, UInt :$lines-every,
                  Real :$min!, Real :$max! where $max > $min,
                  UInt :$width! where * > 0) is export {
