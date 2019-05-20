@@ -73,13 +73,15 @@ sub hbars(@values, Real :$min!, Real :$max! where $max > $min,
 }
 
 
-sub stacked-hbar(@values, @colors, Real :$min!, Real :$max! where $max > $min,
+sub stacked-hbar(@values, @colors, UInt :$lines-every,
+                 Real :$min!, Real :$max! where $max > $min,
                  UInt :$width! where * > 0) is export {
 
     my $cell      = ($max - $min) / $width;
     my $old-val   = $min;
     my $cur-val   = 0;
     my $cur-frac  = 0;
+    my $pos       = 0;
     my $bar       = '';
     my $sliver    = '';
     my $old-color = '';
@@ -102,6 +104,7 @@ sub stacked-hbar(@values, @colors, Real :$min!, Real :$max! where $max > $min,
             $bar       ~= colorize($sliver, $colors);
             $old-val   += $cell - $cur-frac;
             $cur-frac   = 0;
+            $pos++;
             next unless $cur-val > $old-val;
         }
 
@@ -111,6 +114,7 @@ sub stacked-hbar(@values, @colors, Real :$min!, Real :$max! where $max > $min,
         my $frac  = $cells - $floor;
         my $chunk = '█' x $floor;
         $bar ~= colorize($chunk, $color) if $chunk;
+        $pos += $floor;
 
         # If the leftover fraction is big enough to be visible, save the sliver
         # to be combined with the start of the next bar
@@ -127,13 +131,25 @@ sub stacked-hbar(@values, @colors, Real :$min!, Real :$max! where $max > $min,
     }
 
     # Possibly a leftover sliver from last bar
-    $bar ~= colorize($sliver, $old-color) if $cur-frac;
+    if $cur-frac {
+        $bar ~= colorize($sliver, $old-color);
+        $pos++;
+    }
 
     # If bar is too short, pad it
-    my $pad-length = ($max - $cur-val) / $cell;
-    $bar ~= ' ' x $pad-length.floor if $pad-length >= 1;
+    my $pad-length = $width - $pos;
+    my $pad = ' ' x $pad-length;
 
-    $bar
+    if $pad-length && $lines-every {
+        my $start = $lines-every - $pos % $lines-every;
+        for $start, $start + $lines-every ... * {
+            last if $_ > $pad-length - 1;
+            say "$_ out of $pad-length";
+            $pad.substr-rw($_, 1) = '▏';
+        }
+    }
+
+    $bar ~ $pad
 }
 
 
