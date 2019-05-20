@@ -143,6 +143,56 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
 }
 
 
+sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
+               Real :$min!, Real :$max! where $max > $min,
+               UInt :$width! where * > 0, UInt :$bar-spacing = 0) is export {
+
+    return unless @data;
+
+    # A padded line to place between bars, with proper chart lines if requested
+    my $blank-line = stacked-hbar([], :$lines-every, :$min, :$max, :$width);
+
+    # Data is two dimensional
+    if @data[0] ~~ Iterable {
+        # Stacked bar per @data subarray
+        if $stacked {
+            my @bars = gather for @data.kv -> $i, @values {
+                take stacked-hbar(@values, :@colors, :$lines-every, :$min, :$max, :$width);
+                last if $i == @data.end;
+                take $blank-line for ^$bar-spacing;
+            }
+        }
+        # Group of simple bars per @data subarray
+        else {
+            my @bars = gather for @data.kv -> $i, @values {
+                for @values.kv -> $j, $value {
+                    take hbar($value, :$min, :$max, :$width, :$lines-every,
+                              :color(pick-color(@colors, $j)));
+                }
+                last if $i == @data.end;
+                take $blank-line for ^$bar-spacing;
+            }
+        }
+    }
+    # Data is one dimensional
+    else {
+        # A single stacked bar
+        if $stacked {
+            stacked-hbar(@data, :@colors, :$lines-every, :$min, :$max, :$width),;
+        }
+        # Ungrouped simple bars
+        else {
+            my @bars = gather for @data.kv -> $i, $value {
+                take hbar($value, :$min, :$max, :$width, :$lines-every,
+                          :color(pick-color(@colors, $i)));
+                last if $i == @data.end;
+                take $blank-line for ^$bar-spacing;
+            }
+        }
+    }
+}
+
+
 sub area-graph(@data, Real :$row-delta!, :$color, UInt :$lines-every,
                UInt :$max-height = screen-height, UInt :$min-height = 1) is export {
 
