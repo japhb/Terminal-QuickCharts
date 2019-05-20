@@ -34,7 +34,24 @@ multi colorize($text, $color-rule, $item) {
 }
 
 
-sub hbar(Real $value, Real :$min!, Real :$max! where $max > $min,
+sub hpad(Int $pad-length, UInt :$lines-every, UInt :$pos = 0) {
+    return '' unless $pad-length > 0;
+
+    my $pad = ' ' x $pad-length;
+    if $pad-length && $lines-every {
+        my $start = $lines-every - $pos % $lines-every;
+        for $start, $start + $lines-every ... * {
+            last if $_ > $pad-length - 1;
+            $pad.substr-rw($_, 1) = '▏';
+        }
+    }
+
+    $pad
+}
+
+
+sub hbar(Real $value, :$color, UInt :$lines-every,
+         Real :$min!, Real :$max! where $max > $min,
          UInt :$width! where * > 0) is export {
 
     return ' ' x $width if $value <= $min;
@@ -43,33 +60,11 @@ sub hbar(Real $value, Real :$min!, Real :$max! where $max > $min,
     my $cell  = ($max - $min) / $width;
     my $pos   = ($value - $min) / $cell;
     my $frac8 = (($pos - $pos.floor) * 8).floor;
+    my $bar   = '█' x $pos.floor
+              ~ ((0x2590 - $frac8).chr if $frac8);
+    my $pad   = hpad($width - $pos.ceiling, :$lines-every, :pos($bar.chars));
 
-      '█' x $pos.floor
-    ~ ((0x2590 - $frac8).chr if $frac8)
-    ~ ' ' x ($width - $pos.ceiling)
-}
-
-
-sub hbars(@values, Real :$min!, Real :$max! where $max > $min,
-          UInt :$width! where * > 0) is export {
-
-    my $cell = ($max - $min) / $width;
-    my @bars;
-
-    for @values -> $value {
-        my $bar = $value <= $min ?? ' ' x $width !!
-                  $value >= $max ?? '█' x $width !!
-                  do {
-                      my $pos   = ($value - $min) / $cell;
-                      my $frac8 = (($pos - $pos.floor) * 8).floor;
-                        '█' x $pos.floor
-                      ~ ((0x2590 - $frac8).chr if $frac8)
-                      ~ ' ' x ($width - $pos.ceiling)
-                  };
-        @bars.push: $bar;
-    }
-
-    @bars
+    colorize($bar, $color) ~ $pad
 }
 
 
@@ -142,15 +137,7 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
 
     # If bar is too short, pad it
     my $pad-length = $width - $pos;
-    my $pad = ' ' x $pad-length;
-
-    if $pad-length && $lines-every {
-        my $start = $lines-every - $pos % $lines-every;
-        for $start, $start + $lines-every ... * {
-            last if $_ > $pad-length - 1;
-            $pad.substr-rw($_, 1) = '▏';
-        }
-    }
+    my $pad = hpad($pad-length, :$lines-every, :$pos);
 
     $bar ~ $pad
 }
