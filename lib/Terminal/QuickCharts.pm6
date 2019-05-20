@@ -73,7 +73,7 @@ sub hbars(@values, Real :$min!, Real :$max! where $max > $min,
 }
 
 
-sub stacked-hbar(@values, @colors, UInt :$lines-every,
+sub stacked-hbar(@values, :@colors, UInt :$lines-every,
                  Real :$min!, Real :$max! where $max > $min,
                  UInt :$width! where * > 0) is export {
 
@@ -144,7 +144,6 @@ sub stacked-hbar(@values, @colors, UInt :$lines-every,
         my $start = $lines-every - $pos % $lines-every;
         for $start, $start + $lines-every ... * {
             last if $_ > $pad-length - 1;
-            say "$_ out of $pad-length";
             $pad.substr-rw($_, 1) = '▏';
         }
     }
