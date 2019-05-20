@@ -30,7 +30,7 @@ multi colorize($text, $color) {
 }
 
 multi colorize($text, $color-rule, $item) {
-    callwith($text, pick-color($color-rule, $item))
+    colorize($text, pick-color($color-rule, $item))
 }
 
 
