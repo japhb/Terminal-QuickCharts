@@ -240,6 +240,54 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
 }
 
 
+# Calculate the heatmap color ramp once
+# Default ramp is for white backround; reverse for black background
+my @heatmap-colors =
+    (5, 5, 5),                                              # White
+    (5, 5, 4), (5, 5, 3), (5, 5, 2), (5, 5, 1), (5, 5, 0),  # Pale to bright yellow
+    (5, 4, 0), (5, 3, 0), (5, 2, 0), (5, 1, 0), (5, 0, 0),  # Yellow-orange to red
+    (4, 0, 0), (3, 0, 0), (2, 0, 0), (1, 0, 0), (0, 0, 0);  # Brick red to black
+
+my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
+
+
+sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
+                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
+                UInt :$max-height = screen-height, UInt :$min-height = 1) is export {
+    my $delta   = $max - $min;
+    my $rows    = max 1, min $max-height, max $min-height, ceiling($delta / $row-delta);
+    my @pixels  = [] xx 2 * $rows;
+    my $x-scale =    $width / (@data  || 1);
+    my $y-scale = 2 * $rows / ($delta || 1);
+
+    for @data.kv -> $i, $value {
+        my $x = floor $x-scale * $i;
+        my $y = floor $y-scale * ($value - $min);
+        @pixels[$y][$x]++;
+    }
+
+    my @colors = @heatmap-ramp.reverse;
+
+    my @rows;
+    my @cell-cache;
+    for ^$rows .reverse -> int $y {
+        my $top = @pixels[$y * 2 + 1];
+        my $bot = @pixels[$y * 2];
+        # @rows.push: join '', ^$width.map: -> int $x {
+        say join '', ^$width .map: -> int $x {
+            my int $v1 = $top[$x] // 0;
+            my int $v2 = $bot[$x] // 0;
+            @cell-cache[$v1][$v2] //=
+                $v1 == $v2 ?? colored(' ', 'on_'  ~ pick-color(@colors, $v1)) !!
+                              colored('▄',          pick-color(@colors, $v2) ~
+                                           ' on_' ~ pick-color(@colors, $v1))
+        }
+    }
+
+    @rows
+}
+
+
 sub area-graph(@data, Real:D :$row-delta!, :$color, UInt :$lines-every,
                UInt :$max-height = screen-height, UInt :$min-height = 1) is export {
 
