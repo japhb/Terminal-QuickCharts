@@ -50,6 +50,31 @@ sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) {
 }
 
 
+proto color-key(| --> Iterable) is export {*}
+
+#| Render a color key for the colors in a chart, returning a list of ANSI
+#| colored strings, each with a colored bar and a label.  This variant takes
+#| the colors and labels as separate arrays.
+multi color-key(:@colors!, :@labels! --> Iterable) {
+    my @pairs = @labels Z=> @colors;
+    color-key(@pairs)
+}
+
+#| Render a color key for the colors in a chart, returning a list of ANSI
+#| colored strings, each with a colored bar and a label.  This variant takes
+#| a map of label => color and sorts the key lexicographically by label.
+multi color-key(%colors --> Iterable) {
+    color-key(%colors.sort)
+}
+
+#| Render a color key for the colors in a chart, returning a list of ANSI
+#| colored strings, each with a colored bar and a label.  This variant takes
+#| an ordered list of label => color pairs.
+multi color-key(@pairs --> Iterable) {
+    @pairs.map: { colored('███', .value) ~ ' ' ~ .key }
+}
+
+
 #| Render a single horizontal bar (presumably from a bar chart), padded out to
 #| $width, optionally with chart lines drawn at an interval of $lines-every
 #| character cells.  $min is the value at the left end, and $max the value at

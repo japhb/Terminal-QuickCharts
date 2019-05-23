@@ -1,3 +1,34 @@
+### multi sub color-key
+
+```perl6
+multi sub color-key(
+    :@colors!,
+    :@labels!
+) returns Iterable
+```
+
+Render a color key for the colors in a chart, returning a list of ANSI colored strings, each with a colored bar and a label. This variant takes the colors and labels as separate arrays.
+
+### multi sub color-key
+
+```perl6
+multi sub color-key(
+    %colors
+) returns Iterable
+```
+
+Render a color key for the colors in a chart, returning a list of ANSI colored strings, each with a colored bar and a label. This variant takes a map of label => color and sorts the key lexicographically by label.
+
+### multi sub color-key
+
+```perl6
+multi sub color-key(
+    @pairs
+) returns Iterable
+```
+
+Render a color key for the colors in a chart, returning a list of ANSI colored strings, each with a colored bar and a label. This variant takes an ordered list of label => color pairs.
+
 ### sub hbar
 
 ```perl6
