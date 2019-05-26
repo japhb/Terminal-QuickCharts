@@ -251,9 +251,12 @@ my @heatmap-colors =
 my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
+enum Background is export < Black White >;
+
 sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
                 Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
-                UInt :$max-height = screen-height, UInt :$min-height = 1) is export {
+                UInt :$max-height = screen-height, UInt :$min-height = 1,
+                Background :$background = Black) is export {
     my $delta   = $max - $min;
     my $rows    = max 1, min $max-height, max $min-height, ceiling($delta / $row-delta);
     my @pixels  = [] xx 2 * $rows;
@@ -266,7 +269,8 @@ sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
         @pixels[$y][$x]++;
     }
 
-    my @colors = @heatmap-ramp.reverse;
+    my @colors = $background == Black ?? @heatmap-ramp.reverse !! @heatmap-ramp;
+    my $scale  = @colors * $width < @data ?? @colors * $width / @data !! 1;
 
     my @rows;
     my @cell-cache;
@@ -275,8 +279,8 @@ sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
         my $bot = @pixels[$y * 2];
         # @rows.push: join '', ^$width.map: -> int $x {
         say join '', ^$width .map: -> int $x {
-            my int $v1 = $top[$x] // 0;
-            my int $v2 = $bot[$x] // 0;
+            my int $v1 = ceiling ($top[$x] // 0) * $scale;
+            my int $v2 = ceiling ($bot[$x] // 0) * $scale;
             @cell-cache[$v1][$v2] //=
                 $v1 == $v2 ?? colored(' ', 'on_'  ~ pick-color(@colors, $v1)) !!
                               colored('▄',          pick-color(@colors, $v2) ~
