@@ -275,16 +275,18 @@ sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
     my @rows;
     my @cell-cache;
     for ^$rows .reverse -> int $y {
-        my $top = @pixels[$y * 2 + 1];
-        my $bot = @pixels[$y * 2];
-        # @rows.push: join '', ^$width.map: -> int $x {
-        say join '', ^$width .map: -> int $x {
+        my $top  = @pixels[$y * 2 + 1];
+        my $bot  = @pixels[$y * 2];
+        my $rule = +($lines-every && $y %% $lines-every);
+        my $line = $rule ?? 'underline ' !! '';
+
+        @rows.push: join '', ^$width .map: -> int $x {
             my int $v1 = ceiling ($top[$x] // 0) * $scale;
             my int $v2 = ceiling ($bot[$x] // 0) * $scale;
-            @cell-cache[$v1][$v2] //=
-                $v1 == $v2 ?? colored(' ', 'on_'  ~ pick-color(@colors, $v1)) !!
-                              colored('▄',          pick-color(@colors, $v2) ~
-                                           ' on_' ~ pick-color(@colors, $v1))
+            @cell-cache[$rule][$v1][$v2] //=
+                $v1 == $v2 ?? colored(' ', "{$line}on_" ~ pick-color(@colors, $v1)) !!
+                              colored('▀',       $line  ~ pick-color(@colors, $v1) ~
+                                                 ' on_' ~ pick-color(@colors, $v2))
         }
     }
 
