@@ -79,6 +79,10 @@ sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) {
     $pad
 }
 
+sub numeric-label(Real:D $value, ChartStyle:D $style) {
+    my $val = ($value * ($style.y-axis-scale || 1)).round($style.y-axis-round);
+    $style.y-axis-unit ?? "$val $style.y-axis-unit()" !! $val
+}
 
 multi auto-chart('frame-time', @data, UInt:D :$target-fps = 60,
                  Bool:D :$legend = True, Bool:D :$stats = True) is export {
@@ -364,31 +368,49 @@ sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
 }
 
 
-sub area-graph(@data, Real:D :$row-delta!, :$color, UInt :$lines-every,
-               UInt :$max-height = screen-height, UInt :$min-height = 1) is export {
+sub area-graph(@data, Real:D :$row-delta!, :$colors,
+               ChartStyle:D :$style = ChartStyle.new) is export {
 
     my $max  = @data.max;
-    my $rows = max 1, min $max-height, max $min-height, ceiling($max / $row-delta);
+    my $rows = max 1, min $style.max-height, max $style.min-height,
+                                                 ceiling($max / $row-delta);
+    my $cap  = $rows * $row-delta;
+
+    my sub with-y-axis($content, $row, $value) {
+        state $label-width = numeric-label($cap, $style).chars;
+
+        return $content unless $style.show-y-axis;
+
+        my $show  = $row %% ($style.lines-every || 2);
+        my $label = $show ?? numeric-label($value, $style) !! '';
+
+        sprintf("%{$label-width}s▕", $label) ~ $content
+    }
+
     my @rows;
 
     # If data spikes are too tall to fit in graph, use top row to indicate that
-    if $max > $rows * $row-delta {
+    if $style.show-overflow && $max > $cap {
+        # Correct for trimming a row
         $rows--;
-        my $cap = $rows * $row-delta;
+        $cap -= $row-delta;
+
         my $top-row = @data.map({ $_ > $cap ?? '↑' !! ' '}).join;
-        @rows.push: colorize($top-row, $color, $rows);
+        my $colorized = colorize($top-row, $colors, $rows);
+        @rows.push: with-y-axis($colorized, $rows, $cap);
     }
 
     for ^$rows .reverse -> $row {
         my $bot = $row * $row-delta;
         my $top = $bot + $row-delta;
 
-        my $rule = $lines-every && $row %% $lines-every ?? '_' !! ' ';
+        my $rule = $style.lines-every && $row %% $style.lines-every ?? '_' !! ' ';
         my $bars = @data.map({
             $_ >= $top ?? '█'   !!
             $_ <= $bot ?? $rule !! (0x2581 + floor(($_ - $bot) / $row-delta * 8)).chr;
         }).join;
-        @rows.push: colorize($bars, $color, $row);
+        my $colorized = colorize($bars, $colors, $row);
+        @rows.push: with-y-axis($colorized, $row, $bot);
     }
 
     @rows
