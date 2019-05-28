@@ -127,7 +127,7 @@ multi auto-chart('frame-time', @data,
         }
     }
     else {
-        @graph = smoke-chart(@data, :$width, :$row-delta, :lines-every(2));
+        @graph = smoke-chart(@data, :$width, :$row-delta, :style($s));
     }
 
     if $stats {
@@ -345,12 +345,12 @@ my @heatmap-colors =
 my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
-sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
+sub smoke-chart(@data, Real:D :$row-delta!, UInt:D :$width,
                 Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
-                UInt :$max-height = screen-height, UInt :$min-height = 1,
-                Background :$background = Black) is export {
+                ChartStyle:D :$style = ChartStyle.new) is export {
     my $delta   = $max - $min;
-    my $rows    = max 1, min $max-height, max $min-height, ceiling($delta / $row-delta);
+    my $rows    = max 1, min $style.max-height, max $style.min-height,
+                                                    ceiling($delta / $row-delta);
     my @pixels  = [] xx 2 * $rows;
     my $x-scale =    $width / (@data  || 1);
     my $y-scale = 2 * $rows / ($delta || 1);
@@ -361,7 +361,7 @@ sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
         @pixels[$y][$x]++;
     }
 
-    my @colors = $background == Black ?? @heatmap-ramp.reverse !! @heatmap-ramp;
+    my @colors = $style.background == Black ?? @heatmap-ramp.reverse !! @heatmap-ramp;
     my $scale  = @colors * $width < @data ?? @colors * $width / @data !! 1;
 
     my @rows;
@@ -369,7 +369,7 @@ sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
     for ^$rows .reverse -> int $y {
         my $top  = @pixels[$y * 2 + 1];
         my $bot  = @pixels[$y * 2];
-        my $rule = +($lines-every && $y %% $lines-every);
+        my $rule = +($style.lines-every && $y %% $style.lines-every);
         my $line = $rule ?? 'underline ' !! '';
 
         @rows.push: join '', ^$width .map: -> int $x {
