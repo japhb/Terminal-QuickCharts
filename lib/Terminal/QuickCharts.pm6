@@ -59,6 +59,46 @@ sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) {
 }
 
 
+multi auto-chart('frame-time', @data, UInt:D :$target-fps = 60,
+                 Bool:D :$legend = True, Bool:D :$stats = True) is export {
+
+    return unless @data && $target-fps;
+    my $row-delta = 1 / $target-fps;
+    my $width = screen-width;
+    my @graph;
+
+    if @data <= $width {
+        my @colors = < 34 226 202 160 white >;
+        @graph     = area-graph(@data, :$row-delta, :lines-every(2),
+                                :color(@colors));
+        if $legend {
+            my @fps    = (1 ..^ @colors).map: { floor $target-fps / $_ };
+            my @ranges = "{@fps[0]}+",
+                         |(^(@colors-2) .map: { "{@fps[$_+1]}-{@fps[$_]-1}" }),
+                         "< {@fps[*-1]}";
+            my @labels = @ranges.map: { "$_ fps" };
+            my @key    = color-key(:@colors, :@labels);
+            @graph.append: '', '   ' ~ join '  ', @key;
+        }
+    }
+    else {
+        @graph = smoke-chart(@data, :$width, :$row-delta, :lines-every(2));
+    }
+
+    if $stats {
+        my ($frames, $min, $max, $sum) = +@data, @data.min, @data.max, @data.sum;
+        if 0 < all($frames, $min, $max, $sum) {
+            my $ave-time = $sum / $frames;
+            my $ave-fps  = $frames / $sum;
+            @graph.append: '', sprintf("Average: %.1f ms (%.3f fps)",
+                                       $ave-time * 1000, $ave-fps);
+        }
+    }
+
+    @graph
+}
+
+
 proto color-key(| --> Iterable) is export {*}
 
 #| Render a color key for the colors in a chart, returning a list of ANSI
