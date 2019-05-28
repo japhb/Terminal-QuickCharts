@@ -387,15 +387,16 @@ sub smoke-chart(@data, UInt:D :$width, Real:D :$row-delta!, UInt :$lines-every,
 
 
 sub area-graph(@data, Real:D :$row-delta!, :$colors,
+               Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
                ChartStyle:D :$style = ChartStyle.new) is export {
-
-    my $max  = @data.max;
-    my $rows = max 1, min $style.max-height, max $style.min-height,
-                                                 ceiling($max / $row-delta);
-    my $cap  = $rows * $row-delta;
+    my $delta = $max - $min;
+    my $rows  = max 1, min $style.max-height, max $style.min-height,
+                                                  ceiling($delta / $row-delta);
+    my $cap   = $rows * $row-delta + $min;
 
     my sub with-y-axis($content, $row, $value) {
-        state $label-width = numeric-label($cap, $style).chars;
+        state $label-width = max numeric-label($cap, $style).chars,
+                                 numeric-label($min, $style).chars;
 
         return $content unless $style.show-y-axis;
 
@@ -419,7 +420,7 @@ sub area-graph(@data, Real:D :$row-delta!, :$colors,
     }
 
     for ^$rows .reverse -> $row {
-        my $bot = $row * $row-delta;
+        my $bot = $row * $row-delta + $min;
         my $top = $bot + $row-delta;
 
         my $rule = $style.lines-every && $row %% $style.lines-every ?? '_' !! ' ';
