@@ -6,10 +6,19 @@ use Terminal::ANSIColor;
 
 sub screen-height(--> UInt:D) {
     if ::("Terminal::Print") -> \TP {
-        TP.new.rows
+        (PROCESS::<$TERMINAL> || TP.new).rows
     }
     else {
         +qx/tput lines/ || 24
+    }
+}
+
+sub screen-width(--> UInt:D) {
+    if ::("Terminal::Print") -> \TP {
+        (PROCESS::<$TERMINAL> || TP.new).columns
+    }
+    else {
+        +qx/tput cols/ || 80
     }
 }
 
