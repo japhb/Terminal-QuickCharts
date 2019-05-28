@@ -84,19 +84,35 @@ sub numeric-label(Real:D $value, ChartStyle:D $style) {
     $style.y-axis-unit ?? "$val $style.y-axis-unit()" !! $val
 }
 
-multi auto-chart('frame-time', @data, UInt:D :$target-fps = 60,
-                 Bool:D :$legend = True, Bool:D :$stats = True) is export {
+
+my %frame-time-style-defaults =
+    lines-every  => 2,
+    y-axis-scale => 1000,
+    y-axis-unit  => 'ms';
+
+multi auto-chart('frame-time', @data,
+                 ChartStyle:D :$style = ChartStyle.new(|%frame-time-style-defaults),
+                 UInt:D :$target-fps = 60, Bool:D :$stats = True) is export {
 
     return unless @data && $target-fps;
+
+    # XXXX: This feels hackish.  Probably worth a rethink.
+    my $s = $style.lines-every.defined ?? $style !! $style.clone(:lines-every(2));
+
+    my @graph;
+
     my $row-delta = 1 / $target-fps;
     my $width = screen-width;
-    my @graph;
+    if $s.show-y-axis {
+        my $max-label   = numeric-label(@data.max, $style);
+        my $label-width = ($max-label ~ '▕').chars;
+        $width -= $label-width;
+    }
 
     if @data <= $width {
         my @colors = < 34 226 202 160 white >;
-        @graph     = area-graph(@data, :$row-delta, :lines-every(2),
-                                :color(@colors));
-        if $legend {
+        @graph = area-graph(@data, :$row-delta, :@colors, :style($s));
+        if $s.show-legend {
             my @fps    = (1 ..^ @colors).map: { floor $target-fps / $_ };
             my @ranges = "{@fps[0]}+",
                          |(^(@colors-2) .map: { "{@fps[$_+1]}-{@fps[$_]-1}" }),
