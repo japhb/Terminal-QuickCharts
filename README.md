@@ -1,3 +1,8 @@
+class Terminal::QuickCharts::ChartStyle
+---------------------------------------
+
+Collect general chart style info in a unified structure
+
 ### multi sub color-key
 
 ```perl6
