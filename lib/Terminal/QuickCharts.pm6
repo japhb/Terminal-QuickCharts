@@ -105,17 +105,18 @@ multi auto-chart('frame-time', @data,
 
     my @graph;
 
+    my $max       = @data.max;
     my $row-delta = 1 / $target-fps;
-    my $width = screen-width;
+    my $width     = screen-width;
     if $s.show-y-axis {
-        my $max-label   = numeric-label(@data.max, $style);
+        my $max-label   = numeric-label($max, $style);
         my $label-width = ($max-label ~ '▕').chars;
         $width -= $label-width;
     }
 
     if @data <= $width {
         my @colors = < 34 226 202 160 white >;
-        @graph = area-graph(@data, :$row-delta, :@colors, :style($s));
+        @graph = area-graph(@data, :$row-delta, :@colors, :style($s), :min(0), :$max);
         if $s.show-legend {
             my @fps    = (1 ..^ @colors).map: { floor $target-fps / $_ };
             my @ranges = "{@fps[0]}+",
@@ -127,11 +128,11 @@ multi auto-chart('frame-time', @data,
         }
     }
     else {
-        @graph = smoke-chart(@data, :$width, :$row-delta, :style($s));
+        @graph = smoke-chart(@data, :$width, :$row-delta, :style($s), :min(0), :$max);
     }
 
     if $stats {
-        my ($frames, $min, $max, $sum) = +@data, @data.min, @data.max, @data.sum;
+        my ($frames, $min, $sum) = +@data, @data.min, @data.sum;
         if 0 < all($frames, $min, $max, $sum) {
             my $ave-time = $sum / $frames;
             my $ave-fps  = $frames / $sum;
