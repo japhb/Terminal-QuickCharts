@@ -390,15 +390,25 @@ sub smoke-chart(@data, Real:D :$row-delta!, UInt:D :$width,
 sub area-graph(@data, Real:D :$row-delta!, :$colors,
                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
                ChartStyle:D :$style = ChartStyle.new) is export {
+    # Basic sizing
     my $delta = $max - $min;
     my $rows  = max 1, min $style.max-height, max $style.min-height,
                                                   ceiling($delta / $row-delta);
     my $cap   = $rows * $row-delta + $min;
 
-    my sub with-y-axis($content, $row, $value) {
-        state $label-width = max numeric-label($cap, $style).chars,
-                                 numeric-label($min, $style).chars;
+    # Determine whether overflow indicator row is needed and correct for it
+    my $do-overflow = False;
+    if $style.show-overflow && $max > $cap {
+        $rows--;
+        $cap -= $row-delta;
+        $do-overflow = True;
+    }
 
+    # Determine max label width, if y-axis labels are actually desired
+    my $label-width = max numeric-label($cap, $style).chars,
+                          numeric-label($min, $style).chars;
+
+    my sub with-y-axis($content, $row, $value) {
         return $content unless $style.show-y-axis;
 
         my $show  = $row %% ($style.lines-every || 2);
@@ -410,11 +420,7 @@ sub area-graph(@data, Real:D :$row-delta!, :$colors,
     my @rows;
 
     # If data spikes are too tall to fit in graph, use top row to indicate that
-    if $style.show-overflow && $max > $cap {
-        # Correct for trimming a row
-        $rows--;
-        $cap -= $row-delta;
-
+    if $do-overflow {
         my $top-row = @data.map({ $_ > $cap ?? '↑' !! ' '}).join;
         my $colorized = colorize($top-row, $colors, $rows);
         @rows.push: with-y-axis($colorized, $rows, $cap);
