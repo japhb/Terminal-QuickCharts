@@ -410,18 +410,22 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
                        UInt:D :$width!, :@colors!, ChartStyle:D :$style!,
                        Bool:D :$do-overflow!) {
 
-    my @pixels  = [] xx 2 * $rows;
+    # Compute scaling to fit data into content area
     my $x-scale =    $width / (@data || 1);
     my $y-scale = 2 * $rows / (($max - $min) || 1);
 
+    # Convert data into pixel locations and count hits
+    my @pixels = [] xx 2 * $rows;
     for @data.kv -> $i, $value {
         my $x = floor $x-scale * $i;
         my $y = floor $y-scale * ($value - $min);
         @pixels[$y][$x]++;
     }
 
+    # Compute color scaling to prevent washout with very many data points
     my $scale = @colors * $width < @data ?? @colors * $width / @data !! 1;
 
+    # Convert pixels into rows of colored Unicode half-height blocks
     my @rows;
     my @cell-cache;
     for ^$rows .reverse -> int $y {
