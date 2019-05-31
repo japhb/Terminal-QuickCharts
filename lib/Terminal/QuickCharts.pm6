@@ -470,6 +470,7 @@ sub area-graph-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
         @rows.push: colorize($top-row, $colors, $rows);
     }
 
+    # Render rows from top, computing data bars that intersect each row
     for ^$rows .reverse -> $row {
         my $bot = $row * $row-delta + $min;
         my $top = $bot + $row-delta;
