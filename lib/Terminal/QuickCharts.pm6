@@ -392,6 +392,7 @@ sub area-graph(@data, Real:D :$row-delta!, :$colors,
                ChartStyle:D :$style = ChartStyle.new) is export {
     # Basic sizing
     my $delta = $max - $min;
+    my $width = max 1, min $style.max-width,  max $style.min-width, +@data;
     my $rows  = max 1, min $style.max-height, max $style.min-height,
                                                   ceiling($delta / $row-delta);
     my $cap   = $rows * $row-delta + $min;
@@ -407,6 +408,11 @@ sub area-graph(@data, Real:D :$row-delta!, :$colors,
     # Determine max label width, if y-axis labels are actually desired
     my $label-width = max numeric-label($cap, $style).chars,
                           numeric-label($min, $style).chars;
+
+    if $style.show-y-axis {
+        # Make room for labels and axis line
+        $width = max 1, $width - ($label-width + 1);
+    }
 
     my sub with-y-axis($content, $row, $value) {
         return $content unless $style.show-y-axis;
