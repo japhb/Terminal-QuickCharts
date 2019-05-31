@@ -414,22 +414,35 @@ sub area-graph(@data, Real:D :$row-delta!, :$colors,
         $width = max 1, $width - ($label-width + 1);
     }
 
-    my sub with-y-axis($content, $row, $value) {
-        return $content unless $style.show-y-axis;
+    my &content := &area-graph-content;
+    my @rows := content(@data, :$rows, :$row-delta, :$min, :$max, :$cap,
+                        :$width, :$colors, :$style, :$do-overflow);
 
-        my $show  = $row %% ($style.lines-every || 2);
-        my $label = $show ?? numeric-label($value, $style) !! '';
-
-        sprintf("%{$label-width}s▕", $label) ~ $content
+    if $style.show-y-axis {
+        for ^@rows {
+            my $row   = $rows - 1 - $_;
+            my $value = $row * $row-delta + $min;
+            my $show  = $row %% ($style.lines-every || 2);
+            my $label = $show ?? numeric-label($value, $style) !! '';
+            @rows[$_] = sprintf("%{$label-width}s▕", $label) ~ @rows[$_];
+        }
     }
 
+    @rows;
+}
+
+
+# Internal sub, generating just the inner content of the chart (no axes or key)
+sub area-graph-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
+                       Real:D :$min!, Real:D :$max!, Real:D :$cap!,
+                       UInt:D :$width!, :$colors!, ChartStyle:D :$style!,
+                       Bool:D :$do-overflow!) {
     my @rows;
 
     # If data spikes are too tall to fit in graph, use top row to indicate that
     if $do-overflow {
         my $top-row = @data.map({ $_ > $cap ?? '↑' !! ' '}).join;
-        my $colorized = colorize($top-row, $colors, $rows);
-        @rows.push: with-y-axis($colorized, $rows, $cap);
+        @rows.push: colorize($top-row, $colors, $rows);
     }
 
     for ^$rows .reverse -> $row {
@@ -441,8 +454,7 @@ sub area-graph(@data, Real:D :$row-delta!, :$colors,
             $_ >= $top ?? '█'   !!
             $_ <= $bot ?? $rule !! (0x2581 + floor(($_ - $bot) / $row-delta * 8)).chr;
         }).join;
-        my $colorized = colorize($bars, $colors, $row);
-        @rows.push: with-y-axis($colorized, $row, $bot);
+        @rows.push: colorize($bars, $colors, $row);
     }
 
     @rows
