@@ -335,6 +335,9 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
 }
 
 
+# Provide common functionality used by all vertically-oriented charts;
+# actual chart content rendering is handed off to &content, while sizing
+# computations and axis/label rendering is done in this common code.
 sub general-vertical-chart(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
                            Real:D :$max!, ChartStyle:D :$style!, :&content!) {
     # Basic sizing
