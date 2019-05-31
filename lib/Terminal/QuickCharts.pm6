@@ -342,7 +342,6 @@ sub general-vertical-chart(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
                            Real:D :$max!, ChartStyle:D :$style!, :&content!) {
     # Basic sizing
     my $delta = $max - $min;
-    my $width = max 1, min $style.max-width,  max $style.min-width, +@data;
     my $rows  = max 1, min $style.max-height, max $style.min-height,
                                                   ceiling($delta / $row-delta);
     my $cap   = $rows * $row-delta + $min;
@@ -355,14 +354,12 @@ sub general-vertical-chart(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
         $do-overflow = True;
     }
 
-    # Determine max label width, if y-axis labels are actually desired
+    # Determine max label width, if y-axis labels are actually desired,
+    # and set content width to match
     my $label-width = max numeric-label($cap, $style).chars,
                           numeric-label($min, $style).chars;
-
-    if $style.show-y-axis {
-        # Make room for labels and axis line
-        $width = max 1, $width - ($label-width + 1);
-    }
+    my $max-width = $style.max-width - $style.show-y-axis * ($label-width + 1);
+    my $width     = max 1, min $max-width, max $style.min-width, +@data;
 
     # Actually generate the graph content
     my @rows := content(@data, :$rows, :$row-delta, :$min, :$max, :$cap,
