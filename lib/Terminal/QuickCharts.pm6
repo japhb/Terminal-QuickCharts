@@ -335,6 +335,51 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
 }
 
 
+sub general-vertical-chart(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
+                           Real:D :$max!, ChartStyle:D :$style!, :&content!) {
+    # Basic sizing
+    my $delta = $max - $min;
+    my $width = max 1, min $style.max-width,  max $style.min-width, +@data;
+    my $rows  = max 1, min $style.max-height, max $style.min-height,
+                                                  ceiling($delta / $row-delta);
+    my $cap   = $rows * $row-delta + $min;
+
+    # Determine whether overflow indicator row is needed and correct for it
+    my $do-overflow = False;
+    if $style.show-overflow && $max > $cap {
+        $rows--;
+        $cap -= $row-delta;
+        $do-overflow = True;
+    }
+
+    # Determine max label width, if y-axis labels are actually desired
+    my $label-width = max numeric-label($cap, $style).chars,
+                          numeric-label($min, $style).chars;
+
+    if $style.show-y-axis {
+        # Make room for labels and axis line
+        $width = max 1, $width - ($label-width + 1);
+    }
+
+    # Actually generate the graph content
+    my @rows := content(@data, :$rows, :$row-delta, :$min, :$max, :$cap,
+                        :$width, :$colors, :$style, :$do-overflow);
+
+    # Add the y-axis and labels if desired
+    if $style.show-y-axis {
+        for ^@rows {
+            my $row   = $rows - 1 - $_;
+            my $value = $row * $row-delta + $min;
+            my $show  = $row %% ($style.lines-every || 2);
+            my $label = $show ?? numeric-label($value, $style) !! '';
+            @rows[$_] = sprintf("%{$label-width}s▕", $label) ~ @rows[$_];
+        }
+    }
+
+    @rows;
+}
+
+
 # Calculate the heatmap color ramp once
 # Default ramp is for white backround; reverse for black background
 my @heatmap-colors =
@@ -393,51 +438,6 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
     }
 
     @rows
-}
-
-
-sub general-vertical-chart(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
-                           Real:D :$max!, ChartStyle:D :$style!, :&content!) {
-    # Basic sizing
-    my $delta = $max - $min;
-    my $width = max 1, min $style.max-width,  max $style.min-width, +@data;
-    my $rows  = max 1, min $style.max-height, max $style.min-height,
-                                                  ceiling($delta / $row-delta);
-    my $cap   = $rows * $row-delta + $min;
-
-    # Determine whether overflow indicator row is needed and correct for it
-    my $do-overflow = False;
-    if $style.show-overflow && $max > $cap {
-        $rows--;
-        $cap -= $row-delta;
-        $do-overflow = True;
-    }
-
-    # Determine max label width, if y-axis labels are actually desired
-    my $label-width = max numeric-label($cap, $style).chars,
-                          numeric-label($min, $style).chars;
-
-    if $style.show-y-axis {
-        # Make room for labels and axis line
-        $width = max 1, $width - ($label-width + 1);
-    }
-
-    # Actually generate the graph content
-    my @rows := content(@data, :$rows, :$row-delta, :$min, :$max, :$cap,
-                        :$width, :$colors, :$style, :$do-overflow);
-
-    # Add the y-axis and labels if desired
-    if $style.show-y-axis {
-        for ^@rows {
-            my $row   = $rows - 1 - $_;
-            my $value = $row * $row-delta + $min;
-            my $show  = $row %% ($style.lines-every || 2);
-            my $label = $show ?? numeric-label($value, $style) !! '';
-            @rows[$_] = sprintf("%{$label-width}s▕", $label) ~ @rows[$_];
-        }
-    }
-
-    @rows;
 }
 
 
