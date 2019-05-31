@@ -390,6 +390,14 @@ sub smoke-chart(@data, Real:D :$row-delta!, UInt:D :$width,
 sub area-graph(@data, Real:D :$row-delta!, :$colors,
                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
                ChartStyle:D :$style = ChartStyle.new) is export {
+
+    general-vertical-graph(@data, :$row-delta, :$colors, :$min, :$max, :$style,
+                           :content(&area-graph-content))
+}
+
+
+sub general-vertical-graph(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
+                           Real:D :$max!, ChartStyle:D :$style, :&content!) {
     # Basic sizing
     my $delta = $max - $min;
     my $width = max 1, min $style.max-width,  max $style.min-width, +@data;
@@ -414,10 +422,11 @@ sub area-graph(@data, Real:D :$row-delta!, :$colors,
         $width = max 1, $width - ($label-width + 1);
     }
 
-    my &content := &area-graph-content;
+    # Actually generate the graph content
     my @rows := content(@data, :$rows, :$row-delta, :$min, :$max, :$cap,
                         :$width, :$colors, :$style, :$do-overflow);
 
+    # Add the y-axis and labels if desired
     if $style.show-y-axis {
         for ^@rows {
             my $row   = $rows - 1 - $_;
