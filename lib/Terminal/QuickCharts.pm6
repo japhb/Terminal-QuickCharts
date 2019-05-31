@@ -128,7 +128,7 @@ multi auto-chart('frame-time', @data,
         }
     }
     else {
-        @graph = smoke-chart(@data, :$width, :$row-delta, :style($s), :min(0), :$max);
+        @graph = smoke-chart(@data, :$row-delta, :style($s), :min(0), :$max);
     }
 
     if $stats {
@@ -346,15 +346,25 @@ my @heatmap-colors =
 my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
-sub smoke-chart(@data, Real:D :$row-delta!, UInt:D :$width,
+sub smoke-chart(@data, Real:D :$row-delta!,
                 Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
                 ChartStyle:D :$style = ChartStyle.new) is export {
-    my $delta   = $max - $min;
-    my $rows    = max 1, min $style.max-height, max $style.min-height,
-                                                    ceiling($delta / $row-delta);
+
+    my @colors = $style.background == Black ?? @heatmap-ramp.reverse !! @heatmap-ramp;
+    general-vertical-chart(@data, :$row-delta, :@colors, :$min, :$max, :$style,
+                           :content(&smoke-chart-content))
+}
+
+
+# Internal sub, generating just the inner content of the chart (no axes or key)
+sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
+                       Real:D :$min!, Real:D :$max!, Real:D :$cap!,
+                       UInt:D :$width!, :@colors!, ChartStyle:D :$style!,
+                       Bool:D :$do-overflow!) {
+
     my @pixels  = [] xx 2 * $rows;
-    my $x-scale =    $width / (@data  || 1);
-    my $y-scale = 2 * $rows / ($delta || 1);
+    my $x-scale =    $width / (@data || 1);
+    my $y-scale = 2 * $rows / (($max - $min) || 1);
 
     for @data.kv -> $i, $value {
         my $x = floor $x-scale * $i;
@@ -362,8 +372,7 @@ sub smoke-chart(@data, Real:D :$row-delta!, UInt:D :$width,
         @pixels[$y][$x]++;
     }
 
-    my @colors = $style.background == Black ?? @heatmap-ramp.reverse !! @heatmap-ramp;
-    my $scale  = @colors * $width < @data ?? @colors * $width / @data !! 1;
+    my $scale = @colors * $width < @data ?? @colors * $width / @data !! 1;
 
     my @rows;
     my @cell-cache;
