@@ -1,7 +1,7 @@
-use v6.c;
 unit module Terminal::QuickCharts:ver<0.0.1>;
 
 use Terminal::ANSIColor;
+use Terminal::QuickCharts::Helpers;
 
 
 #| Background hint for color maps
@@ -28,60 +28,6 @@ class ChartStyle {
     has Background $.background = Black;
 }
 
-
-sub screen-height(--> UInt:D) {
-    if ::("Terminal::Print") -> \TP {
-        (PROCESS::<$TERMINAL> || TP.new).rows
-    }
-    else {
-        +qx/tput lines/ || 24
-    }
-}
-
-sub screen-width(--> UInt:D) {
-    if ::("Terminal::Print") -> \TP {
-        (PROCESS::<$TERMINAL> || TP.new).columns
-    }
-    else {
-        +qx/tput cols/ || 80
-    }
-}
-
-
-sub pick-color($color-rule, $item) {
-    given $color-rule {
-        when Seq         { .flat[$item]             } # e.g. < red white > xx *
-        when Positional  { .[$item] // .[*-1] // '' } # last color auto-repeats
-        when Associative { .{$item}                 } # no default!
-        when Callable    { .($item)                 } # calculate color
-        default          { $_                       } # fixed (or no) color
-    }
-}
-
-
-multi colorize(Str:D $text, $color --> Str:D) {
-    $color ?? colored($text, $color) !! $text
-}
-
-multi colorize(Str:D $text, $color-rule, $item --> Str:D) {
-    colorize($text, pick-color($color-rule, $item))
-}
-
-
-sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) {
-    return '' unless $pad-length > 0;
-
-    my $pad = ' ' x $pad-length;
-    if $pad-length && $lines-every {
-        my $start = $lines-every - $pos % $lines-every;
-        for $start, $start + $lines-every ... * {
-            last if $_ > $pad-length - 1;
-            $pad.substr-rw($_, 1) = '▏';
-        }
-    }
-
-    $pad
-}
 
 sub numeric-label(Real:D $value, ChartStyle:D $style) {
     my $val = ($value * ($style.y-axis-scale || 1)).round($style.y-axis-round);
