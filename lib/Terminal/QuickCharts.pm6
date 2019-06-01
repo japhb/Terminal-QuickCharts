@@ -114,8 +114,8 @@ multi auto-chart('frame-time', @data,
         $width -= $label-width;
     }
 
+    my @colors = < 34 226 202 160 white >;
     if @data <= $width {
-        my @colors = < 34 226 202 160 white >;
         @graph = area-graph(@data, :$row-delta, :@colors, :style($s), :min(0), :$max);
         if $s.show-legend {
             my @fps    = (1 ..^ @colors).map: { floor $target-fps / $_ };
@@ -134,11 +134,20 @@ multi auto-chart('frame-time', @data,
     if $stats {
         my ($frames, $min, $sum) = +@data, @data.min, @data.sum;
         if 0 < all($frames, $min, $max, $sum) {
-            my $ave-time = $sum / $frames;
-            my $ave-fps  = $frames / $sum;
-            my $min-fps  = 1 / $max;
-            my $max-fps  = 1 / $min;
-            @graph.append: '', sprintf("Min: %.1f ms (%.1f fps) - Ave: %.1f ms (%.1f fps) - Max: %.1f ms (%.1f fps)", $min * 1000, $max-fps, $ave-time * 1000, $ave-fps, $max * 1000, $min-fps);
+            my $ave       = $sum / $frames;
+            my $ave-fps   = $frames / $sum;
+            my $min-fps   = 1 / $max;
+            my $max-fps   = 1 / $min;
+            my $min-color = pick-color(@colors, floor($min * $target-fps));
+            my $ave-color = pick-color(@colors, floor($ave * $target-fps));
+            my $max-color = pick-color(@colors, floor($max * $target-fps));
+            my $info = sprintf(colored('Min: %.1f ms (%.1f fps)', $min-color) ~ ' - ' ~
+                               colored('Ave: %.1f ms (%.1f fps)', $ave-color) ~ ' - ' ~
+                               colored('Max: %.1f ms (%.1f fps)', $max-color),
+                               $min * 1000, $max-fps,
+                               $ave * 1000, $ave-fps,
+                               $max * 1000, $min-fps);
+            @graph.append: '', $info;
         }
     }
 
