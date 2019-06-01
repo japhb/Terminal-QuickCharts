@@ -364,8 +364,8 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
                        Bool:D :$do-overflow!) {
 
     # Compute scaling to fit data into content area
-    my $x-scale =    $width / (@data || 1);
-    my $y-scale = 2 * $rows / (($max - $min) || 1);
+    my $x-scale = $width / (@data || 1);
+    my $y-scale = (2 * $rows - 1) / (($max - $min) || 1);
 
     # Convert data into pixel locations and count hits
     my @pixels = [] xx 2 * $rows;
