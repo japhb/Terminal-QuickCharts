@@ -136,8 +136,9 @@ multi auto-chart('frame-time', @data,
         if 0 < all($frames, $min, $max, $sum) {
             my $ave-time = $sum / $frames;
             my $ave-fps  = $frames / $sum;
-            @graph.append: '', sprintf("Average: %.1f ms (%.3f fps)",
-                                       $ave-time * 1000, $ave-fps);
+            my $min-fps  = 1 / $max;
+            my $max-fps  = 1 / $min;
+            @graph.append: '', sprintf("Min: %.1f ms (%.1f fps) - Ave: %.1f ms (%.1f fps) - Max: %.1f ms (%.1f fps)", $min * 1000, $max-fps, $ave-time * 1000, $ave-fps, $max * 1000, $min-fps);
         }
     }
 
