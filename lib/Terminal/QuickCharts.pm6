@@ -391,11 +391,11 @@ my @heatmap-colors =
 my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
-sub smoke-chart(@data, Real:D :$row-delta!,
+sub smoke-chart(@data, Real:D :$row-delta!, :@colors,
                 Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
                 ChartStyle:D :$style = ChartStyle.new) is export {
 
-    my @colors = $style.background == Black ?? @heatmap-ramp.reverse !! @heatmap-ramp;
+    @colors ||= $style.background == Black ?? @heatmap-ramp.reverse !! @heatmap-ramp;
     general-vertical-chart(@data, :$row-delta, :@colors, :$min, :$max, :$style,
                            :content(&smoke-chart-content))
 }
