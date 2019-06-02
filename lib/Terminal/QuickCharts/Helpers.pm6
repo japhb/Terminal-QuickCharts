@@ -28,24 +28,29 @@ sub screen-width(--> UInt:D) is export {
 }
 
 
-#| Pick a color using a color rule and an item identifier.  The color rule can
-#| be any of the following:
+#| Pick a color using a color rule and an item.  The color rule can be any of
+#| the following:
+#|
 #|    * Seq (in which case it is flattened and indexed into),
 #|    * Positional (in which case it is indexed into, repeating the last color
-#|      if needed, or '' if the Positional was empty),
+#|      if needed),
 #|    * Associative (in which case it is keyed with the item, with no default),
-#|    * Callable (in which case it is called with the item identifier as its
-#|      only positional argument),
+#|    * Callable (in which case it is called with the item as its only
+#|      positional argument),
 #|    * any other type (in which case the color rule is used as the color, for
 #|      fixed or no color)
-sub pick-color($color-rule, $item) is export {
-    given $color-rule {
-        when Seq         { .flat[$item]             } # e.g. < red white > xx *
-        when Positional  { .[$item] // .[*-1] // '' } # last color auto-repeats
-        when Associative { .{$item}                 } # no default!
-        when Callable    { .($item)                 } # calculate color
-        default          { $_                       } # fixed (or no) color
+#|
+#| If the picked color is defined, it is stringified; otherwise '' is returned.
+sub pick-color($color-rule, $item --> Str:D) is export {
+    my $color = do given $color-rule {
+        when Seq         { .cache.flat[$item] } # e.g. < red white > xx *
+        when Positional  { .[$item] // .[*-1] } # last color auto-repeats
+        when Associative { .{$item}           } # no default!
+        when Callable    { .($item)           } # calculate color
+        default          { $_                 } # fixed (or no) color
     }
+
+    $color.defined ?? ~$color !! ''
 }
 
 
