@@ -51,7 +51,8 @@ sub pick-color($color-rule, $item) is export {
 
 #| Optionally (if $color is true) color text using Terminal::ANSIColor
 multi colorize(Str:D $text, $color --> Str:D) is export {
-    $color ?? colored($text, $color) !! $text
+    $color ~~ Str:D  ?? ($color ?? colored($text,  $color) !! $text) !!
+    $color ~~ Cool:D ??            colored($text, ~$color) !! $text
 }
 
 #| Pick a color using pick-color and then colorize text as per previous multi
