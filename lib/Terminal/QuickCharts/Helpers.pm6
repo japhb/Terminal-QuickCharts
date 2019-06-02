@@ -6,7 +6,7 @@ use Terminal::ANSIColor;
 #| Determine screen height in rows, first attempting to use Terminal::Print if
 #| loaded, then falling back to `tput`, and finally hardcoded 24 rows.
 sub screen-height(--> UInt:D) is export {
-    if ::("Terminal::Print") -> \TP {
+    if (my \TP = ::('Terminal::Print')) !~~ Failure {
         (PROCESS::<$TERMINAL> || TP.new).rows
     }
     else {
@@ -19,7 +19,7 @@ sub screen-height(--> UInt:D) is export {
 #| Terminal::Print if loaded, then falling back to `tput`, and finally hardcoded
 #| 80 columns.
 sub screen-width(--> UInt:D) is export {
-    if ::("Terminal::Print") -> \TP {
+    if (my \TP = ::('Terminal::Print')) !~~ Failure {
         (PROCESS::<$TERMINAL> || TP.new).columns
     }
     else {
