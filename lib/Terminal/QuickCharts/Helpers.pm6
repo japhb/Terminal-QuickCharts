@@ -74,7 +74,8 @@ sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) is exp
 
     my $pad = ' ' x $pad-length;
     if $pad-length && $lines-every {
-        my $start = $lines-every - $pos % $lines-every;
+        my $offset = $pos % $lines-every;
+        my $start  = $offset ?? $lines-every - $offset !! 0;
         for $start, $start + $lines-every ... * {
             last if $_ > $pad-length - 1;
             $pad.substr-rw($_, 1) = '▏';
