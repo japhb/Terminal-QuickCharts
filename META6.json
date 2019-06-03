@@ -12,6 +12,7 @@
   "perl" : "6.c",
   "provides" : {
     "Terminal::QuickCharts" : "lib/Terminal/QuickCharts.pm6",
+    "Terminal::QuickCharts::ChartStyle" : "lib/Terminal/QuickCharts/ChartStyle.pm6",
     "Terminal::QuickCharts::Helpers" : "lib/Terminal/QuickCharts/Helpers.pm6"
   },
   "resources" : [ ],
