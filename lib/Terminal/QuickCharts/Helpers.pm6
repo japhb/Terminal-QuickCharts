@@ -10,6 +10,7 @@ sub screen-height(--> UInt:D) is export {
         (PROCESS::<$TERMINAL> || TP.new).rows
     }
     else {
+        TP.so;   # defang Failure
         +qx/tput lines/ || 24
     }
 }
@@ -23,6 +24,7 @@ sub screen-width(--> UInt:D) is export {
         (PROCESS::<$TERMINAL> || TP.new).columns
     }
     else {
+        TP.so;   # defang Failure
         +qx/tput cols/ || 80
     }
 }
