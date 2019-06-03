@@ -13,7 +13,8 @@
   "provides" : {
     "Terminal::QuickCharts" : "lib/Terminal/QuickCharts.pm6",
     "Terminal::QuickCharts::ChartStyle" : "lib/Terminal/QuickCharts/ChartStyle.pm6",
-    "Terminal::QuickCharts::Helpers" : "lib/Terminal/QuickCharts/Helpers.pm6"
+    "Terminal::QuickCharts::Helpers" : "lib/Terminal/QuickCharts/Helpers.pm6",
+    "Terminal::QuickCharts::Pieces" : "lib/Terminal/QuickCharts/Pieces.pm6"
   },
   "resources" : [ ],
   "source-url" : "",
