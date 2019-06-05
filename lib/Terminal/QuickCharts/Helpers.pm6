@@ -66,23 +66,3 @@ multi colorize(Str:D $text, $color --> Str:D) is export {
 multi colorize(Str:D $text, $color-rule, $item --> Str:D) is export {
     colorize($text, pick-color($color-rule, $item))
 }
-
-
-#| Render a single span of horizontal chart padding, optionally with chart
-#| lines added every $lines-every columns, with chart line phase determined by
-#| $pos (usually the visual width of whatever was to the left of the padding).
-sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) is export {
-    return '' unless $pad-length > 0;
-
-    my $pad = ' ' x $pad-length;
-    if $pad-length && $lines-every {
-        my $offset = $pos % $lines-every;
-        my $start  = $offset ?? $lines-every - $offset !! 0;
-        for $start, $start + $lines-every ... * {
-            last if $_ > $pad-length - 1;
-            $pad.substr-rw($_, 1) = '▏';
-        }
-    }
-
-    $pad
-}
