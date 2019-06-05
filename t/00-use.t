@@ -1,5 +1,7 @@
 use Test;
 use Terminal::QuickCharts::Helpers;
+use Terminal::QuickCharts::Pieces;
+use Terminal::QuickCharts::ChartStyle;
 use Terminal::QuickCharts;
 
 
