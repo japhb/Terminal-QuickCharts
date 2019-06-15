@@ -98,9 +98,9 @@ is hbar( 5, :color<red>, :min(1), :max(5), :width(10), :lines-every(0)), "\e[31m
 is hbar(12, :color<red>, :min(1), :max(5), :width(10), :lines-every(0)), "\e[31m██████████\e[0m", "hbar with value > max and lines-every == 0";
 
 is hbar(-2, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "▏ ▏ ▏ ▏ ▏ ", "hbar with value < min and lines-every == 2";
-is hbar( 1, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "▏ ▏ ▏ ▏ ▏ ", "hbar with value == min and lines-every == 2";
+is hbar( 1, :color<red>, :min(1), :max(5), :width(10), :lines-every(3)), "▏  ▏  ▏  ▏", "hbar with value == min and lines-every == 3";
 is hbar( 5, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "\e[31m██████████\e[0m", "hbar with value == max and lines-every == 2";
-is hbar(12, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "\e[31m██████████\e[0m", "hbar with value > max and lines-every == 2";
+is hbar(12, :color<red>, :min(1), :max(5), :width(10), :lines-every(3)), "\e[31m██████████\e[0m", "hbar with value > max and lines-every == 3";
 
 
 done-testing;
