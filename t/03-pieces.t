@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::Pieces;
 
 
-plan 45;
+plan 54;
 
 
 # hpad($pad-length, :$lines-every, :$pos)
@@ -59,6 +59,26 @@ is hpad(3, :lines-every(1), :pos(4)), '▏▏▏', 'hpad with all: lines-every 1
 is hpad(3, :lines-every(2), :pos(4)), '▏ ▏', 'hpad with all: lines-every 2, pos 4';
 is hpad(3, :lines-every(3), :pos(4)), '  ▏', 'hpad with all: lines-every 3, pos 4';
 is hpad(3, :lines-every(4), :pos(4)), '▏  ', 'hpad with all: lines-every 4, pos 4';
+
+
+# color-key(@pairs)
+is-deeply color-key([]), (), 'color-key(empty @pairs)';
+is-deeply color-key(['foo' => 'green']), ("\e[32m███\e[0m foo",), 'color-key(one item @pairs)';
+is-deeply color-key(['foo' => 'green', 'bar' => 'red']), ("\e[32m███\e[0m foo", "\e[31m███\e[0m bar"), 'color-key(two @pairs)';
+
+
+# color-key(%colors)
+is-deeply color-key({}), (), 'color-key(empty %pairs)';
+is-deeply color-key({ baz => 'white' }), ("\e[37m███\e[0m baz",), 'color-key(one-entry %colors)';
+is-deeply color-key({ quux => 'yellow', bitz => 'blue' }), ("\e[34m███\e[0m bitz", "\e[33m███\e[0m quux"), 'color-key(two-entry %colors)';
+
+
+# XXXX: What if colors and labels are different lengths?
+
+# color-key(:@colors!, :@labels!)
+is-deeply color-key(:labels([]), :colors([])), (), 'color-key(empty labels/colors)';
+is-deeply color-key(:labels(['baz']), :colors(['white'])), ("\e[37m███\e[0m baz",), 'color-key(one each labels/colors)';
+is-deeply color-key(:colors<yellow blue>, :labels<quux bitz>), ("\e[33m███\e[0m quux", "\e[34m███\e[0m bitz"), 'color-key(two each labels/colors)';
 
 
 done-testing;
