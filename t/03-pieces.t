@@ -73,7 +73,7 @@ is-deeply color-key({ baz => 'white' }), ("\e[37m███\e[0m baz",), 'color-k
 is-deeply color-key({ quux => 'yellow', bitz => 'blue' }), ("\e[34m███\e[0m bitz", "\e[33m███\e[0m quux"), 'color-key(two-entry %colors)';
 
 
-# XXXX: What if colors and labels are different lengths?
+# XXXX: What if @colors and @labels are different lengths?
 
 # color-key(:@colors!, :@labels!)
 is-deeply color-key(:labels([]), :colors([])), (), 'color-key(empty labels/colors)';
