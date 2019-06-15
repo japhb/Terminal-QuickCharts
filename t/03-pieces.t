@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::Pieces;
 
 
-plan 54;
+plan 70;
 
 
 # hpad($pad-length, :$lines-every, :$pos)
@@ -79,6 +79,28 @@ is-deeply color-key({ quux => 'yellow', bitz => 'blue' }), ("\e[34m███\e[0
 is-deeply color-key(:labels([]), :colors([])), (), 'color-key(empty labels/colors)';
 is-deeply color-key(:labels(['baz']), :colors(['white'])), ("\e[37m███\e[0m baz",), 'color-key(one each labels/colors)';
 is-deeply color-key(:colors<yellow blue>, :labels<quux bitz>), ("\e[33m███\e[0m quux", "\e[34m███\e[0m bitz"), 'color-key(two each labels/colors)';
+
+
+# hbar($value, :$color, :$lines-every, :$min!, :$max!, :$width!)
+is hbar(-2, :min(1), :max(5), :width(10)), "          ", "hbar with value < min and no color";
+is hbar( 1, :min(1), :max(5), :width(10)), "          ", "hbar with value == min and no color";
+is hbar( 5, :min(1), :max(5), :width(10)), "██████████", "hbar with value == max and no color";
+is hbar(12, :min(1), :max(5), :width(10)), "██████████", "hbar with value > max and no color";
+
+is hbar(-2, :color<red>, :min(1), :max(5), :width(10)), "          ", "hbar with value < min";
+is hbar( 1, :color<red>, :min(1), :max(5), :width(10)), "          ", "hbar with value == min";
+is hbar( 5, :color<red>, :min(1), :max(5), :width(10)), "\e[31m██████████\e[0m", "hbar with value == max";
+is hbar(12, :color<red>, :min(1), :max(5), :width(10)), "\e[31m██████████\e[0m", "hbar with value > max";
+
+is hbar(-2, :color<red>, :min(1), :max(5), :width(10), :lines-every(0)), "          ", "hbar with value < min and lines-every == 0";
+is hbar( 1, :color<red>, :min(1), :max(5), :width(10), :lines-every(0)), "          ", "hbar with value == min and lines-every == 0";
+is hbar( 5, :color<red>, :min(1), :max(5), :width(10), :lines-every(0)), "\e[31m██████████\e[0m", "hbar with value == max and lines-every == 0";
+is hbar(12, :color<red>, :min(1), :max(5), :width(10), :lines-every(0)), "\e[31m██████████\e[0m", "hbar with value > max and lines-every == 0";
+
+is hbar(-2, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "▏ ▏ ▏ ▏ ▏ ", "hbar with value < min and lines-every == 2";
+is hbar( 1, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "▏ ▏ ▏ ▏ ▏ ", "hbar with value == min and lines-every == 2";
+is hbar( 5, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "\e[31m██████████\e[0m", "hbar with value == max and lines-every == 2";
+is hbar(12, :color<red>, :min(1), :max(5), :width(10), :lines-every(2)), "\e[31m██████████\e[0m", "hbar with value > max and lines-every == 2";
 
 
 done-testing;
