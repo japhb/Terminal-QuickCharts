@@ -77,7 +77,7 @@ sub hbar(Real:D $value, :$color, UInt :$lines-every,
               ~ ((0x2590 - $frac8).chr if $frac8);
     my $pad   = hpad($width - $bar.chars, :$lines-every, :pos($bar.chars));
 
-    colorize($bar, $color) ~ $pad
+    (colorize($bar, $color) if $bar) ~ $pad
 }
 
 
