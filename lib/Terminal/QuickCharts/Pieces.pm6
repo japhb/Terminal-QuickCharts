@@ -67,8 +67,8 @@ sub hbar(Real:D $value, :$color, UInt :$lines-every,
          Real:D :$min!, Real:D :$max! where $max > $min,
          UInt:D :$width! where * > 0 --> Str:D) is export {
 
-    return ' ' x $width if $value <= $min;
-    return '█' x $width if $value >= $max;
+    return hpad($width, :$lines-every, :pos(0)) if $value <= $min;
+    return colorize('█' x $width, $color)       if $value >= $max;
 
     my $cell  = ($max - $min) / $width;
     my $pos   = ($value - $min) / $cell;
