@@ -2,8 +2,8 @@ unit module Terminal::QuickCharts:ver<0.0.1>;
 
 use Terminal::ANSIColor;
 use Terminal::QuickCharts::Helpers;
-use Terminal::QuickCharts::ChartStyle;
 use Terminal::QuickCharts::Pieces;
+use Terminal::QuickCharts::ChartStyle;
 
 
 # Render the text for a numeric Y-axis label, including scaling and rounding
