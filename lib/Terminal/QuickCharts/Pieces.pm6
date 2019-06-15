@@ -1,3 +1,5 @@
+# ABSTRACT: Chart pieces with all params explicit (not using ChartStyle)
+
 unit module Terminal::QuickCharts::Pieces;
 
 use Terminal::ANSIColor;

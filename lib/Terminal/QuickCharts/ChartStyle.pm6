@@ -1,3 +1,5 @@
+# ABSTRACT: Style classes and associated enums
+
 use Terminal::QuickCharts::Helpers;
 
 

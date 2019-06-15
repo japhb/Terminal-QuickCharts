@@ -1,3 +1,5 @@
+# ABSTRACT: Very basic terminal helper functions independent of use in charts
+
 unit module Terminal::QuickCharts::Helpers;
 
 use Terminal::ANSIColor;
