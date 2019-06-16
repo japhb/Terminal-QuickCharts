@@ -178,10 +178,11 @@ sub general-vertical-chart(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
 
     # Add the y-axis and labels if desired
     if $style.show-y-axis {
+        my $labels-every = $style.lines-every || ($rows / 5).ceiling;
         for ^@rows {
             my $row   = $rows - 1 - $_;
             my $value = $row * $row-delta + $min;
-            my $show  = $row %% ($style.lines-every || 2);
+            my $show  = $row %% $labels-every;
             my $label = $show ?? numeric-label($value, $style) !! '';
             @rows[$_] = sprintf("%{$label-width}s▕", $label) ~ @rows[$_];
         }
