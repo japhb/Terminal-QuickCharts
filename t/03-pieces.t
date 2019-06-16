@@ -154,4 +154,17 @@ is-deeply gather { take hbar($_, :color<blue>, :min(-1), :max(3), :width(4), :li
 "Correct hbar lengths for normal use";
 
 
+# stacked-hbar(@values, :@colors, :$lines-every, :$min!, :$max!, :$width!)
+
+# XXXX: Test that stacked-hbar with no values produces only uncolored padding
+
+# XXXX: Test that stacked-hbar with one value and one color produces the same result as hbar with the same values
+
+# XXXX: Test that stacked-hbar with any number of values and 0 or 1 colors produces the same result as hbar would for the sum of the values
+
+# XXXX: Test that stacked-hbar with two values and 2+ colors produces a sensible result
+
+# XXXX: Test that stacked-hbar with 3+ values and 2+ colors produces a sensible result
+
+
 done-testing;
