@@ -157,11 +157,11 @@ is-deeply gather { take hbar($_, :color<blue>, :min(-1), :max(3), :width(4), :li
 # stacked-hbar(@values, :@colors, :$lines-every, :$min!, :$max!, :$width!)
 is stacked-hbar([], :min(-1), :max(17), :width(5)), hpad(5), "stacked-hbar([])";
 is stacked-hbar([], :min( 5), :max(11), :width(6),
-                :colors<red blue green>),          hpad(6), "stacked-hbar([], :colors)";
+                :colors<red blue green>),           hpad(6), "stacked-hbar([], :colors)";
 is stacked-hbar([], :min(2.1), :max(8), :width(7),
-                :lines-every(2)),                  hpad(7, :lines-every(2)), "stacked-hbar([], :lines-every)";
+                :lines-every(2)),                   hpad(7, :lines-every(2)), "stacked-hbar([], :lines-every)";
 is stacked-hbar([], :min(.1), :max(.2), :width(8),
-                :colors('red',), :lines-every(3)), hpad(8, :lines-every(3)), "stacked-hbar([], :colors, :lines-every)";
+                :colors('red',), :lines-every(3)),  hpad(8, :lines-every(3)), "stacked-hbar([], :colors, :lines-every)";
 
 my %options = :min(-1), :max(3), :width(4), :lines-every(3);
 for -1.3, -1.2 ... 3.3 {
