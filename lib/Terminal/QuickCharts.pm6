@@ -149,13 +149,20 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
 # Provide common functionality used by all vertically-oriented charts;
 # actual chart content rendering is handed off to &content, while sizing
 # computations and axis/label rendering is done in this common code.
-sub general-vertical-chart(@data, Real:D :$row-delta!, :$colors!, Real:D :$min!,
+sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :$min!,
                            Real:D :$max!, ChartStyle:D :$style!, :&content!) {
     # Basic sizing
     my $delta = $max - $min;
-    my $rows  = max 1, min $style.max-height, max $style.min-height,
+    my $rows;
+    if $row-delta {
+        $rows = max 1, min $style.max-height, max $style.min-height,
                                                   ceiling($delta / $row-delta);
-    my $cap   = $rows * $row-delta + $min;
+    }
+    else {
+        $rows = max 1, $style.max-height;
+        $row-delta = $delta / $rows;
+    }
+    my $cap = $rows * $row-delta + $min;
 
     # Determine whether overflow indicator row is needed and correct for it
     my $do-overflow = False;
@@ -203,7 +210,7 @@ my @heatmap-colors =
 my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
-sub smoke-chart(@data, Real:D :$row-delta!, :@colors,
+sub smoke-chart(@data, Real :$row-delta, :@colors,
                 Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
                 ChartStyle:D :$style = ChartStyle.new) is export {
 
@@ -257,7 +264,7 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
 }
 
 
-sub area-graph(@data, Real:D :$row-delta!, :$colors,
+sub area-graph(@data, Real :$row-delta, :$colors,
                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
                ChartStyle:D :$style = ChartStyle.new) is export {
 
