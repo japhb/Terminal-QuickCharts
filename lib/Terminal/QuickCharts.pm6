@@ -239,7 +239,7 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
     for ^$rows .reverse -> int $y {
         my $top  = @pixels[$y * 2 + 1];
         my $bot  = @pixels[$y * 2];
-        my $rule = +($style.lines-every && $y %% $style.lines-every);
+        my $rule = +($style.lines-every && $y %% $style.lines-every || 0);
         my $line = $rule ?? 'underline ' !! '';
 
         @rows.push: join '', ^$width .map: -> int $x {
