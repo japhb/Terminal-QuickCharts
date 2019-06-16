@@ -95,9 +95,9 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
     my $cur-val   = 0;
     my $cur-frac  = 0;
     my $pos       = 0;
-    my $bar       = '';
     my $sliver    = '';
     my $old-color = '';
+    my @spans;
 
     for @values.kv -> $i, $value {
         # Make sure new bar isn't hidden behind other bars or the borders
@@ -114,7 +114,7 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
         #       narrow bar that should appear right after it.
         if $cur-frac {
             my $colors  = $color ?? "$old-color on_$color" !! $old-color;
-            $bar       ~= colorize($sliver, $colors);
+            @spans.push:  $sliver => $colors;
             $old-val   += $cell - $cur-frac;
             $cur-frac   = 0;
             $pos++;
@@ -126,7 +126,7 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
         my $floor = $cells.floor;
         my $frac  = $cells - $floor;
         my $chunk = '█' x $floor;
-        $bar ~= colorize($chunk, $color) if $chunk;
+        @spans.push: $chunk => $color;
         $pos += $floor;
 
         # If the leftover fraction is big enough to be visible, save the sliver
@@ -145,7 +145,7 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
 
     # Possibly a leftover sliver from last bar
     if $cur-frac {
-        $bar ~= colorize($sliver, $old-color);
+        @spans.push: $sliver => $old-color;
         $pos++;
     }
 
@@ -153,5 +153,5 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
     my $pad-length = $width - $pos;
     my $pad = hpad($pad-length, :$lines-every, :$pos);
 
-    $bar ~ $pad
+    join-colorized-spans(@spans) ~ $pad
 }
