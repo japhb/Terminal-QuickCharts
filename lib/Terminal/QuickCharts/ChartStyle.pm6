@@ -12,7 +12,7 @@ class Terminal::QuickCharts::ChartStyle {
     has UInt:D $.min-width      = 1;
     has UInt:D $.max-width      = screen-width;
     has UInt:D $.min-height     = 1;
-    has UInt:D $.max-height     = screen-height;
+    has UInt:D $.max-height     = screen-height() - 1;
 
     # Y Axis attributes
     has Bool:D $.show-y-axis    = True;
