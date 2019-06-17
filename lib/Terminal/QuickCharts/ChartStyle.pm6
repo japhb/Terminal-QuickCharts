@@ -17,8 +17,8 @@ class Terminal::QuickCharts::ChartStyle {
     # Y Axis attributes
     has Bool:D $.show-y-axis    = True;
     has Str:D  $.y-axis-unit    = '';
-    has Real:D $.y-axis-round   = 1;     # Round axis labels to nearest unit
-    has Int    $.y-axis-scale;           # Not defined => auto
+    has Real   $.y-axis-round;           # 0 or undefined => auto
+    has Int    $.y-axis-scale;           # 0 or undefined => auto
 
     # Misc attributes
     has UInt   $.lines-every;            # Chart lines every N cells if true

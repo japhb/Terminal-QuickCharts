@@ -6,6 +6,38 @@ use Terminal::QuickCharts::Pieces;
 use Terminal::QuickCharts::ChartStyle;
 
 
+# Figure out reasonable defaults for y-axis unit/rounding/scaling
+sub default-y-scaling(Real:D :$min!, Real:D :$max!, ChartStyle:D :$style!) {
+    my $scale-by = 1000;
+    my $max-abs  = max $min.abs, $max.abs;
+    my $delta    = $max - $min;
+    my $scale    = $style.y-axis-scale;
+
+    my @prefixes = |< y z a f p n μ m >, '', |< k M G T P E Z Y >;
+    my $index    = @prefixes.first: !*, :k;
+    unless $scale {
+        $scale = 1;
+        while $max-abs > $scale-by {
+            $max-abs /= $scale-by;
+            $scale   /= $scale-by;
+            $index++;
+            last if $index >= @prefixes - 1;
+        }
+        while $max-abs < 1 {
+            $max-abs *= $scale-by;
+            $scale   *= $scale-by;
+            $index--;
+            last if $index <= 0;
+        }
+    }
+
+    my $round = $style.y-axis-round || ($delta * $scale > 10 ?? 1 !! .1);
+    my $unit  = @prefixes[$index] ~ $style.y-axis-unit;
+
+    { y-axis-unit => $unit, y-axis-round => $round, y-axis-scale => $scale }
+}
+
+
 # Render the text for a numeric Y-axis label, including scaling and rounding
 # the value, and appending a unit if any.
 sub numeric-label(Real:D $value, ChartStyle:D $style) {
@@ -172,25 +204,28 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
         $do-overflow = True;
     }
 
+    # Compute scaling defaults
+    my $s = $style.clone: |default-y-scaling(:$min, :max($cap), :$style);
+
     # Determine max label width, if y-axis labels are actually desired,
     # and set content width to match
-    my $label-width = max numeric-label($cap, $style).chars,
-                          numeric-label($min, $style).chars;
-    my $max-width = $style.max-width - $style.show-y-axis * ($label-width + 1);
-    my $width     = max 1, min $max-width, max $style.min-width, +@data;
+    my $label-width = max numeric-label($cap, $s).chars,
+                          numeric-label($min, $s).chars;
+    my $max-width = $s.max-width - $s.show-y-axis * ($label-width + 1);
+    my $width     = max 1, min $max-width, max $s.min-width, +@data;
 
     # Actually generate the graph content
     my @rows := content(@data, :$rows, :$row-delta, :$min, :$max, :$cap,
-                        :$width, :$colors, :$style, :$do-overflow);
+                        :$width, :$colors, :style($s), :$do-overflow);
 
     # Add the y-axis and labels if desired
-    if $style.show-y-axis {
-        my $labels-every = $style.lines-every || ($rows / 5).ceiling;
+    if $s.show-y-axis {
+        my $labels-every = $s.lines-every || min 10, ($rows / 5).ceiling;
         for ^@rows {
             my $row   = $rows - 1 - $_;
             my $value = $row * $row-delta + $min;
             my $show  = $row %% $labels-every;
-            my $label = $show ?? numeric-label($value, $style) !! '';
+            my $label = $show ?? numeric-label($value, $s) !! '';
             @rows[$_] = sprintf("%{$label-width}s▕", $label) ~ @rows[$_];
         }
     }
