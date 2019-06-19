@@ -26,3 +26,35 @@ class Terminal::QuickCharts::ChartStyle {
     has Bool:D $.show-legend    = True;  # Show color legend if needed
     has Terminal::QuickCharts::Background $.background = Dark;
 }
+
+
+#| Coerce to a ChartStyle instance, setting defaults if needed
+proto style-with-defaults(| --> Terminal::QuickCharts::ChartStyle) is export {*}
+
+#| Clone a ChartStyle instance, setting defaults if needed
+multi style-with-defaults(Terminal::QuickCharts::ChartStyle:D $style, %defaults) {
+    my @attribs = Terminal::QuickCharts::ChartStyle.^attributes.map: { .name.substr(2) };
+    my %def;
+    for %defaults.keys {
+        next unless $_ ∈ @attribs;
+        next if $style."$_"().defined;
+        %def{$_} = %defaults{$_};
+    }
+
+    $style.clone(|%def)
+}
+
+#| Construct a ChartStyle instance using %defaults, with overrides from %style
+multi style-with-defaults(%style, %defaults) {
+    Terminal::QuickCharts::ChartStyle.new(|%defaults, |%style)
+}
+
+#| Construct a ChartStyle instance using just %defaults
+multi style-with-defaults(%defaults) {
+    Terminal::QuickCharts::ChartStyle.new(|%defaults)
+}
+
+#| Base case: return the provided ChartStyle instance
+multi style-with-defaults(Terminal::QuickCharts::ChartStyle:D $style) {
+    $style
+}
