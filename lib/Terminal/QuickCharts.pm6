@@ -51,14 +51,12 @@ my %frame-time-style-defaults =
     y-axis-scale => 1000,
     y-axis-unit  => 'ms';
 
-multi auto-chart('frame-time', @data,
-                 ChartStyle:D :$style = ChartStyle.new(|%frame-time-style-defaults),
+multi auto-chart('frame-time', @data, :$style,
                  UInt:D :$target-fps = 60, Bool:D :$stats = True) is export {
 
     return unless @data && $target-fps;
 
-    # XXXX: This feels hackish.  Probably worth a rethink.
-    my $s = $style.lines-every.defined ?? $style !! $style.clone(:lines-every(2));
+    my $s = style-with-defaults($style, %frame-time-style-defaults);
 
     my @graph;
 
@@ -182,30 +180,34 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
 # actual chart content rendering is handed off to &content, while sizing
 # computations and axis/label rendering is done in this common code.
 sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :$min!,
-                           Real:D :$max!, ChartStyle:D :$style!, :&content!) {
+                           Real:D :$max!, :$style!, :&content!) {
+
+    # Make sure we have a defined ChartStyle instance
+    my $s = style-with-defaults($style);
+
     # Basic sizing
     my $delta = $max - $min;
     my $rows;
     if $row-delta {
-        $rows = max 1, min $style.max-height, max $style.min-height,
-                                                  ceiling($delta / $row-delta);
+        $rows = max 1, min $s.max-height, max $s.min-height,
+                                              ceiling($delta / $row-delta);
     }
     else {
-        $rows = max 1, $style.max-height;
+        $rows = max 1, $s.max-height;
         $row-delta = $delta / $rows;
     }
     my $cap = $rows * $row-delta + $min;
 
     # Determine whether overflow indicator row is needed and correct for it
     my $do-overflow = False;
-    if $style.show-overflow && $max > $cap {
+    if $s.show-overflow && $max > $cap {
         $rows--;
         $cap -= $row-delta;
         $do-overflow = True;
     }
 
-    # Compute scaling defaults
-    my $s = $style.clone: |default-y-scaling(:$min, :max($cap), :$style);
+    # Compute and apply scaling defaults
+    $s = style-with-defaults($s, default-y-scaling(:$min, :max($cap), :style($s)));
 
     # Determine max label width, if y-axis labels are actually desired,
     # and set content width to match
@@ -245,12 +247,13 @@ my @heatmap-colors =
 my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
-sub smoke-chart(@data, Real :$row-delta, :@colors,
-                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
-                ChartStyle:D :$style = ChartStyle.new) is export {
+sub smoke-chart(@data, Real :$row-delta, :@colors, :$style,
+                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max) is export {
 
-    @colors ||= $style.background == Dark ?? @heatmap-ramp.reverse !! @heatmap-ramp;
-    general-vertical-chart(@data, :$row-delta, :@colors, :$min, :$max, :$style,
+    my $s = style-with-defaults($style);
+    @colors ||= $s.background == Dark ?? @heatmap-ramp.reverse !! @heatmap-ramp;
+
+    general-vertical-chart(@data, :$row-delta, :@colors, :$min, :$max, :style($s),
                            :content(&smoke-chart-content))
 }
 
@@ -299,9 +302,8 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
 }
 
 
-sub area-graph(@data, Real :$row-delta, :$colors,
-               Real:D :$min = min(0, @data.min), Real:D :$max = @data.max,
-               ChartStyle:D :$style = ChartStyle.new) is export {
+sub area-graph(@data, Real :$row-delta, :$colors, :$style,
+               Real:D :$min = min(0, @data.min), Real:D :$max = @data.max) is export {
 
     general-vertical-chart(@data, :$row-delta, :$colors, :$min, :$max, :$style,
                            :content(&area-graph-content))
