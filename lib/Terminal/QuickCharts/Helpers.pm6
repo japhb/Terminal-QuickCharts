@@ -72,7 +72,7 @@ multi colorize(Str:D $text, $color-rule, $item --> Str:D) is export {
 
 #| Merge neighboring spans of the same color in a list of text => color pairs
 sub merge-color-spans(@spans) is export {
-    return () unless @spans;
+    return [] unless @spans;
 
     my $color = @spans[0].value;
     my $text  = '';
@@ -83,13 +83,13 @@ sub merge-color-spans(@spans) is export {
             $text ~= .key;
         }
         else {
-            @merged.push: $text => $color if $text;
+            @merged.push: $text => $color<> if $text;
             $color = .value;
-            $text  = '';
+            $text  = .key;
         }
     }
 
-    @merged.push: $text => $color if $text;
+    @merged.push: $text => $color<> if $text;
 
     @merged
 }
