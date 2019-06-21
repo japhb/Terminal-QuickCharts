@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::Helpers;
 
 
-plan 46;
+plan 52;
 
 
 # screen-width() and screen-height()
@@ -70,6 +70,27 @@ is colorize('baz', { g => 'yellow' }, 'g'), "\e[33mbaz\e[0m", 'colorize by rule:
 is colorize('baz', < red white >,       4), "\e[37mbaz\e[0m", 'colorize by rule: Positional';
 is colorize('baz', < bold green > xx *, 4), "\e[1mbaz\e[0m",  'colorize by rule: Seq';
 is colorize('baz', -> $i { 'cyan' },    3), "\e[36mbaz\e[0m", 'colorize by rule: Callable';
+
+
+# merge-color-spans(@spans)
+is-deeply merge-color-spans([]),
+                            [],
+         "merge-color-spans([]) => ()";
+is-deeply merge-color-spans(['foo' => 'bar']),
+                            ['foo' => 'bar'],
+         "merge-color-spans(1 pair) => (same pair,)";
+is-deeply merge-color-spans(['foo' => 'bar', 'baz' => 'quux']),
+                            ['foo' => 'bar', 'baz' => 'quux'],
+         "merge-color-spans(2 unrelated pairs) => (same two pairs)";
+is-deeply merge-color-spans(['foo' => 'bar', 'baz' => 'bar']),
+                            ['foobaz' => 'bar'],
+         "merge-color-spans merges on color";
+is-deeply merge-color-spans(['foo' => 'bar', 'foo' => 'quux']),
+                            ['foo' => 'bar', 'foo' => 'quux'],
+         "merge-color-spans does NOT merge on text";
+is-deeply merge-color-spans(< a b c d e f g > Z=> < q r r r s r r >),
+                           [< a  bcd  e  fg > Z=> < q   r   s  r  >],
+         "merge-color-spans merges multiples, but not across gaps";
 
 
 done-testing;
