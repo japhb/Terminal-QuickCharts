@@ -1,3 +1,5 @@
+# Use in dependency sorted order for easier debugging of failures
+
 use Test;
 use Terminal::QuickCharts::Helpers;
 use Terminal::QuickCharts::Pieces;
