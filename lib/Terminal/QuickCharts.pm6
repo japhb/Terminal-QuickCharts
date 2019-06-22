@@ -46,15 +46,15 @@ sub numeric-label(Real:D $value, ChartStyle:D $style) {
 }
 
 
-my %frame-time-style-defaults =
-    lines-every  => 2,
-    y-axis-scale => 1000,
-    y-axis-unit  => 'ms';
-
 multi auto-chart('frame-time', @data, :$style,
                  UInt:D :$target-fps = 60, Bool:D :$stats = True) is export {
 
     return unless @data && $target-fps;
+
+    my %frame-time-style-defaults =
+        lines-every  => 2,
+        y-axis-scale => 1000,
+        y-axis-unit  => 'ms';
 
     my $s = style-with-defaults($style, %frame-time-style-defaults);
 
