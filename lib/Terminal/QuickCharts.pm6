@@ -238,13 +238,14 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
 
     # Compute scaling to fit data into content area
     my $x-scale = $width / (@data || 1);
-    my $y-scale = (2 * $rows - 1) / (($cap - $min) || 1);
+    # Last half row of data should be centered in top row of pixels
+    my $y-scale = (2 * $rows - 1) / (($rows - 1/4) * $row-delta || 1);
 
     # Convert data into pixel locations and count hits
     my @pixels = [] xx 2 * $rows;
     for @data.kv -> $i, $value {
         my $x = floor $x-scale * $i;
-        my $y = floor $y-scale * ($value - $min);
+        my $y = floor $y-scale * ($value - $min) + .5;
         @pixels[$y][$x]++;
     }
 
