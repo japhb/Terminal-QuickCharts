@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::ChartStyle;
 
 
-plan 47;
+plan 52;
 
 
 # enum Terminal::QuickCharts::Background
@@ -121,6 +121,16 @@ ok $cs6.y-axis-scale.defined
 == $cs.y-axis-scale.defined, "empty has default (undefined) y-axis-scale";
 ok $cs6.lines-every.defined
 == $cs.lines-every.defined,  "empty has default (undefined) lines-every";
+
+
+# style-with-defaults(Any:U, %defaults)
+my $cs7 = style-with-defaults(Any, %defaults);
+type-check($cs7, 'empty-plus-defaults');
+
+nok $cs7.show-y-axis,        "empty-plus-defaults overriding true value succeeds";
+is  $cs7.y-axis-unit, 'z',   "empty-plus-defaults overriding defined false value succeeds";
+ok  $cs7.y-axis-round == 10, "empty-plus-defaults overriding undefined with a true value succeeds";
+ok  $cs7.y-axis-scale == 0,  "empty-plus-defaults overriding undefined with a false value succeeds";
 
 
 done-testing;
