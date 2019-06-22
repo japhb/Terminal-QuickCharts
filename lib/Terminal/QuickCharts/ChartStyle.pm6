@@ -59,6 +59,11 @@ multi style-with-defaults(Terminal::QuickCharts::ChartStyle:D $style) {
     $style
 }
 
+#| Undefined + hash case: fall back to using just hash
+multi style-with-defaults(Any:U, %defaults) {
+    style-with-defaults(%defaults)
+}
+
 #| Empty case: return a new default ChartStyle instance
 multi style-with-defaults(Any:U) {
     Terminal::QuickCharts::ChartStyle.new
