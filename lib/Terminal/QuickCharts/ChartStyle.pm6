@@ -58,3 +58,8 @@ multi style-with-defaults(%defaults) {
 multi style-with-defaults(Terminal::QuickCharts::ChartStyle:D $style) {
     $style
 }
+
+#| Empty case: return a new default ChartStyle instance
+multi style-with-defaults(Any:U) {
+    Terminal::QuickCharts::ChartStyle.new
+}
