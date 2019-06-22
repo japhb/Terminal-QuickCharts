@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::ChartStyle;
 
 
-plan 119;
+plan 47;
 
 
 # enum Terminal::QuickCharts::Background
@@ -12,24 +12,26 @@ ok Light ~~ Terminal::QuickCharts::Background, "Light is a valid Background";
 
 # Minimal type checks for ChartStyle instances
 sub type-check($cs, $test-set) {
-    ok $cs ~~ Terminal::QuickCharts::ChartStyle:D, "$test-set ChartStyle.new works";
+    subtest "$test-set type checks", {
+        ok $cs ~~ Terminal::QuickCharts::ChartStyle:D, "$test-set ChartStyle.new works";
 
-    ok $cs.min-width     ~~ UInt:D, "$test-set min-width is a defined UInt";
-    ok $cs.max-width     ~~ UInt:D, "$test-set max-width is a defined UInt";
-    ok $cs.min-height    ~~ UInt:D, "$test-set min-height is a defined UInt";
-    ok $cs.max-height    ~~ UInt:D, "$test-set max-height is a defined UInt";
+        ok $cs.min-width     ~~ UInt:D, "$test-set min-width is a defined UInt";
+        ok $cs.max-width     ~~ UInt:D, "$test-set max-width is a defined UInt";
+        ok $cs.min-height    ~~ UInt:D, "$test-set min-height is a defined UInt";
+        ok $cs.max-height    ~~ UInt:D, "$test-set max-height is a defined UInt";
 
-    ok $cs.show-y-axis   ~~ Bool:D, "$test-set show-y-axis is a defined Bool";
-    ok $cs.y-axis-unit   ~~ Str:D,  "$test-set y-axis-unit is a defined Str";
-    ok $cs.y-axis-round  ~~ Real,   "$test-set y-axis-round is a Real";
-    ok $cs.y-axis-scale  ~~ Real,   "$test-set y-axis-scale is a Real";
+        ok $cs.show-y-axis   ~~ Bool:D, "$test-set show-y-axis is a defined Bool";
+        ok $cs.y-axis-unit   ~~ Str:D,  "$test-set y-axis-unit is a defined Str";
+        ok $cs.y-axis-round  ~~ Real,   "$test-set y-axis-round is a Real";
+        ok $cs.y-axis-scale  ~~ Real,   "$test-set y-axis-scale is a Real";
 
-    ok $cs.lines-every   ~~ UInt,   "$test-set lines-every is a UInt";
-    ok $cs.show-overflow ~~ Bool:D, "$test-set show-overflow is a defined Bool";
-    ok $cs.show-legend   ~~ Bool:D, "$test-set show-legend is a defined Bool";
+        ok $cs.lines-every   ~~ UInt,   "$test-set lines-every is a UInt";
+        ok $cs.show-overflow ~~ Bool:D, "$test-set show-overflow is a defined Bool";
+        ok $cs.show-legend   ~~ Bool:D, "$test-set show-legend is a defined Bool";
 
-    ok $cs.background    ~~ Terminal::QuickCharts::Background:D,
-                            "$test-set background is a defined Background";
+        ok $cs.background    ~~ Terminal::QuickCharts::Background:D,
+                                "$test-set background is a defined Background";
+    }
 }
 
 
