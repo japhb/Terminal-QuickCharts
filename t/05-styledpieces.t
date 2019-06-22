@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::StyledPieces;
 
 
-plan 60;
+plan 61;
 
 
 # numeric-label($value, $style)
@@ -105,5 +105,12 @@ is numeric-label(6.0,   $cs6), '20 s',  "scaled rounded numeric-label works with
 is numeric-label(42,    $cs6), '170 s', "scaled rounded numeric-label works with negative Int and unit";
 
 
-done-testing;
+# default-y-scaling(:$min!, :$max!, :$style!)
+is-deeply default-y-scaling(:min(0), :max(0), :style($cs)),
+          { y-axis-unit => '', y-axis-round => 1, y-axis-scale => 1 },
+          "default-y-scaling(0..0) defaults are correct";
 
+# XXXX: Lots more combos of default-y-scaling
+
+
+done-testing;
