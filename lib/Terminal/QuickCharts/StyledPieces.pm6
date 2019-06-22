@@ -42,6 +42,8 @@ sub default-y-scaling(Real:D :$min!, Real:D :$max!,
 #| the value, and appending a unit if any.
 sub numeric-label(Real:D $value,
                   Terminal::QuickCharts::ChartStyle:D $style) is export {
-    my $val = ($value * ($style.y-axis-scale || 1)).round($style.y-axis-round);
+    my $val = $value * ($style.y-axis-scale || 1);
+    $val   .= round($style.y-axis-round) if $style.y-axis-round;
+
     $style.y-axis-unit ?? "$val $style.y-axis-unit()" !! $val
 }
