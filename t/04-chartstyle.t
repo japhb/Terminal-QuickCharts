@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::ChartStyle;
 
 
-plan 94;
+plan 119;
 
 
 # enum Terminal::QuickCharts::Background
@@ -95,6 +95,30 @@ nok $cs5.show-y-axis,        "overriden true value remains";
 is  $cs5.y-axis-unit, 'z',   "overriden defined false value remains";
 ok  $cs5.y-axis-round == 10, "overriden undefined with a true value remains";
 ok  $cs5.y-axis-scale == 0,  "overriden undefined with a false value remains";
+
+
+# style-with-defaults(Any:U)
+my $cs6 = style-with-defaults(Any);
+type-check($cs6, 'empty');
+
+ok $cs6.min-width     == $cs.min-width,     "empty has default min-width";
+ok $cs6.max-width     == $cs.max-width,     "empty has default max-width";
+ok $cs6.min-height    == $cs.min-height,    "empty has default min-height";
+ok $cs6.max-height    == $cs.max-height,    "empty has default max-height";
+
+ok $cs6.show-y-axis   == $cs.show-y-axis,   "empty has default show-y-axis";
+ok $cs6.show-legend   == $cs.show-legend,   "empty has default show-legend";
+ok $cs6.show-overflow == $cs.show-overflow, "empty has default show-overflow";
+
+ok $cs6.background    == $cs.background,    "empty has default background";
+ok $cs6.y-axis-unit   eq $cs.y-axis-unit,   "empty has default y-axis-unit";
+
+ok $cs6.y-axis-round.defined
+== $cs.y-axis-round.defined, "empty has default (undefined) y-axis-round";
+ok $cs6.y-axis-scale.defined
+== $cs.y-axis-scale.defined, "empty has default (undefined) y-axis-scale";
+ok $cs6.lines-every.defined
+== $cs.lines-every.defined,  "empty has default (undefined) lines-every";
 
 
 done-testing;
