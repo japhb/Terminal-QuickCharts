@@ -15,7 +15,8 @@ multi auto-chart('frame-time', @data, :$style,
     my %frame-time-style-defaults =
         lines-every  => 2,
         y-axis-scale => 1000,
-        y-axis-unit  => 'ms';
+        y-axis-unit  => 'ms',
+        y-axis-round => 1;
 
     my $s = style-with-defaults($style, %frame-time-style-defaults);
 
