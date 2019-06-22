@@ -31,7 +31,7 @@ sub default-y-scaling(Real:D :$min!, Real:D :$max!,
         }
     }
 
-    my $round = $style.y-axis-round || ($delta && $delta * $scale <= 10 ?? .1 !! 1);
+    my $round = $style.y-axis-round || ($delta && $delta * $scale <= 20 ?? .1 !! 1);
     my $unit  = @prefixes[$index] ~ $style.y-axis-unit;
 
     { y-axis-unit => $unit, y-axis-round => $round, y-axis-scale => $scale }
