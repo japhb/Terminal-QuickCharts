@@ -183,7 +183,7 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
 
     # Add the y-axis and labels if desired
     if $s.show-y-axis {
-        my $labels-every = $s.lines-every || min 10, ($rows / 5).ceiling;
+        my $labels-every = $s.lines-every || min 8, ($rows / 5).ceiling;
         for ^@rows {
             my $row   = $rows - 1 - $_;
             my $value = $row * $row-delta + $min;
