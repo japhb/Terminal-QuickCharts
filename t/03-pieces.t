@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::Pieces;
 
 
-plan 169;
+plan 1235;
 
 
 # hpad($pad-length, :$lines-every, :$pos)
@@ -163,20 +163,36 @@ is stacked-hbar([], :min(2.1), :max(8), :width(7),
 is stacked-hbar([], :min(.1), :max(.2), :width(8),
                 :colors('red',), :lines-every(3)),  hpad(8, :lines-every(3)), "stacked-hbar([], :colors, :lines-every)";
 
-my %options = :min(-1), :max(3), :width(4), :lines-every(3);
-for -1.3, -1.2 ... 3.3 {
+my %options = :min(0), :max(3), :width(3), :lines-every(2);
+for 0, .1 ... 3.3 {
     is stacked-hbar([$_], |%options),
                hbar( $_,  |%options),
        "stacked-hbar(1 value, no color) eq hbar: $_";
 }
 
-for -1.3, -1.2 ... 3.3 {
+for 0, .1 ... 3.3 {
     is stacked-hbar([$_], :colors('bold',), |%options),
                hbar( $_,  :color<bold>,     |%options),
        "stacked-hbar(1 value, 1 color) eq hbar: $_";
 }
 
-# XXXX: Test that stacked-hbar with 2+ values and 0 or 1 colors produces the same result as hbar would for the sum of the values
+for 0, .1 ... 2.0 -> $i {
+    for 0, .1 ... 2.5 -> $j {
+        my $value = $j > 0 ?? $i + $j !! $i;
+        is stacked-hbar([$i, $j], |%options),
+                   hbar( $value,  |%options),
+           "stacked-bar(2 values, no color) eq hbar: $i, $j ==> $value";
+    }
+}
+
+for 0, .1 ... 2.0 -> $i {
+    for 0, .1 ... 2.5 -> $j {
+        my $value = $j > 0 ?? $i + $j !! $i;
+        is stacked-hbar([$i, $j], :colors('cyan',), |%options),
+                   hbar( $value,  :color<cyan>,     |%options),
+           "stacked-bar(2 values, 1 color) eq hbar: $i, $j ==> $value";
+    }
+}
 
 # XXXX: Test that stacked-hbar with 2 values and 2+ colors produces a sensible result
 
