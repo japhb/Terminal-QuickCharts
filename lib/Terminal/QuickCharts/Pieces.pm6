@@ -90,6 +90,20 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
                  Real:D :$min!, Real:D :$max! where $max > $min,
                  UInt:D :$width! where * > 0 --> Str:D) is export {
 
+    # Filter out nonpositive values, and merge same-colored values
+    my @vals;
+    for @values.kv -> $i, $value {
+        next unless $value > 0;
+        my $color = pick-color(@colors, $i);
+        if @vals && $color eq @vals[*-1][1] {
+            @vals[*-1][0] += $value;
+        }
+        else {
+            @vals.push: [$value, $color];
+        }
+    }
+
+    # Main bar generation loop
     my $cell      = ($max - $min) / $width;
     my $old-val   = $min;
     my $cur-val   = 0;
@@ -99,12 +113,10 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
     my $old-color = '';
     my @spans;
 
-    for @values.kv -> $i, $value {
+    for @vals -> [ $value, $color ] {
         # Make sure new bar isn't hidden behind other bars or the borders
         $cur-val = min($cur-val + $value, $max);
         next unless $cur-val > $old-val;
-
-        my $color = pick-color(@colors, $i);
 
         # Finish off left-over sliver from previous bar
         #
