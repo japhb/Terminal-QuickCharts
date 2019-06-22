@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::Helpers;
 
 
-plan 52;
+plan 63;
 
 
 # screen-width() and screen-height()
@@ -91,6 +91,36 @@ is-deeply merge-color-spans(['foo' => 'bar', 'foo' => 'quux']),
 is-deeply merge-color-spans(< a b c d e f g > Z=> < q r r r s r r >),
                            [< a  bcd  e  fg > Z=> < q   r   s  r  >],
          "merge-color-spans merges multiples, but not across gaps";
+
+
+# join-colorized-spans(@spans)
+is join-colorized-spans([]),   '',
+  "join-colorized-spans([]) => ''";
+is join-colorized-spans(['' => '']),   '',
+  "join-colorized-spans(['' => '']) => ''";
+is join-colorized-spans(['' => 'green']), '',
+  "join-colorized-spans will skip an empty colored span";
+is join-colorized-spans(['foo' => '']), "foo",
+  "join-colorized-spans can recognize an uncolored span";
+is join-colorized-spans(['bar' => 'underline']), "\e[4mbar\e[0m",
+  "join-colorized-spans can color a single text span";
+
+is join-colorized-spans(['foo' => 'bold', 'bar' => 'bold']), "\e[1mfoobar\e[0m",
+  "join-colorized-spans can merge two same-colored spans";
+is join-colorized-spans(['foo' => 'bold', 'bar' => 'red']),  "\e[1mfoo\e[0m\e[31mbar\e[0m",
+  "join-colorized-spans keeps different-colored spans separate";
+is join-colorized-spans(['foo' => '',     'bar' => 'red']),  "foo\e[31mbar\e[0m",
+  "join-colorized-spans handles mixing colored and uncolored spans: uncolored first";
+is join-colorized-spans(['foo' => 'bold', 'bar' => '']),     "\e[1mfoo\e[0mbar",
+  "join-colorized-spans handles mixing colored and uncolored spans: colored first";
+is join-colorized-spans(['foo' => '',     'bar' => '']),     "foobar",
+  "join-colorized-spans can merge two uncolored spans";
+
+is join-colorized-spans(['' => 'bold', 'z' => '', 'b' => 'bold', 'y' => 'bold',
+			 'xanadu' => 'bold', 'e' => 'red', 'fred' => '',
+			 'w' => 'red', 'h' => 'red', 'i' => 'bold', 'h' => '']),
+   "z\e[1mbyxanadu\e[0m\e[31me\e[0mfred\e[31mwh\e[0m\e[1mi\e[0mh",
+   "join-colorized-spans handles complex mixtures of spans";
 
 
 done-testing;
