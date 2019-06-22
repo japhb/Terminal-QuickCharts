@@ -18,13 +18,13 @@ class Terminal::QuickCharts::ChartStyle {
     has Bool:D $.show-y-axis    = True;
     has Str:D  $.y-axis-unit    = '';
     has Real   $.y-axis-round;           # 0 or undefined => auto
-    has Int    $.y-axis-scale;           # 0 or undefined => auto
+    has Real   $.y-axis-scale;           # 0 or undefined => auto
 
     # Misc attributes
     has UInt   $.lines-every;            # Chart lines every N cells if true
     has Bool:D $.show-overflow  = True;  # Add arrows to indicate overflowed data
     has Bool:D $.show-legend    = True;  # Show color legend if needed
-    has Terminal::QuickCharts::Background $.background = Dark;
+    has Terminal::QuickCharts::Background:D $.background = Dark;
 }
 
 
