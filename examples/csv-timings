@@ -1,0 +1,29 @@
+#!/usr/bin/env perl6
+
+use v6;
+use Terminal::QuickCharts;
+
+
+#| Graph timings from [Tux]'s archive of CSV library performance
+sub MAIN(Str $variant = 'test-t', Str :$timings-file = 'speed-all.log') {
+    unless $timings-file.IO.r {
+        note "Can't read timings file '$timings-file'.  You may need to download it from\nhttps://tux.nl/Talks/CSV6/speed-all.log\n";
+        exit;
+    }
+
+    my regex timing-line {
+        ^   \d\d\d\d\-\d\d\-\d\d  # date
+        \s+ \d\d\:\d\d\:\d\d      # time
+        \s+ (.*?)                 # test
+        \s+ (\d+\.\d+) $          # seconds
+    }
+
+    my @timings = gather for $timings-file.IO.lines {
+        next unless .contains($variant);
+        if .match(&timing-line) {
+            take +~$1 if $0 eq $variant;
+        }
+    }
+
+    .say for smoke-chart @timings;
+}
