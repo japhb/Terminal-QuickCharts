@@ -89,18 +89,21 @@ multi auto-chart('frame-time', @data, :$style,
 # or groups of simple bars packed together (if $stacked is False), with each
 # group separated by $bar-spacing lines containing only chart lines.
 sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
-               Real:D :$min!, Real:D :$max! where $max > $min,
+               Real :$min is copy, Real :$max is copy,
                UInt:D :$width! where * > 0, UInt :$bar-spacing = 0) is export {
 
     return unless @data;
-
-    # A padded line to place between bars, with proper chart lines if requested
-    my $blank-line = stacked-hbar([], :$lines-every, :$min, :$max, :$width);
 
     # Data is two dimensional
     if @data[0] ~~ Iterable {
         # Stacked bar per @data subarray
         if $stacked {
+            $min //= 0;
+            $max //= @data.map(*.grep(* > 0).sum).max;
+
+            # A padded line to place between bars, with proper chart lines if requested
+            my $blank-line = stacked-hbar([], :$lines-every, :$min, :$max, :$width);
+
             my @bars = gather for @data.kv -> $i, @values {
                 take stacked-hbar(@values, :@colors, :$lines-every, :$min, :$max, :$width);
                 last if $i == @data.end;
@@ -109,6 +112,12 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
         }
         # Group of simple bars per @data subarray
         else {
+            $min //= min 0, @data.map(*.min).min;
+            $max //= @data.map(*.max).max;
+
+            # A padded line to place between bars, with proper chart lines if requested
+            my $blank-line = stacked-hbar([], :$lines-every, :$min, :$max, :$width);
+
             my @bars = gather for @data.kv -> $i, @values {
                 for @values.kv -> $j, $value {
                     take hbar($value, :$min, :$max, :$width, :$lines-every,
@@ -123,10 +132,18 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
     else {
         # A single stacked bar
         if $stacked {
+            $min //= 0;
+            $max //= @data.grep(* > 0).sum;
             stacked-hbar(@data, :@colors, :$lines-every, :$min, :$max, :$width),;
         }
         # Ungrouped simple bars
         else {
+            $min //= min 0, @data.min;
+            $max //= @data.max;
+
+            # A padded line to place between bars, with proper chart lines if requested
+            my $blank-line = stacked-hbar([], :$lines-every, :$min, :$max, :$width);
+
             my @bars = gather for @data.kv -> $i, $value {
                 take hbar($value, :$min, :$max, :$width, :$lines-every,
                           :color(pick-color(@colors, $i)));
