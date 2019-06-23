@@ -72,22 +72,22 @@ multi auto-chart('frame-time', @data, :$style,
 }
 
 
-#| Render the bars for a horizontal bar chart, padded out to $width, and
-#| optionally with chart lines drawn at an interval of $lines-every character
-#| cells.  $min is the value at the left end of each bar, and $max the value at
-#| the far right (including the padding).
-#|
-#| hbar-chart() works in four modes, depending on whether the data is one- or
-#| two-dimensional, and whether $stacked is True or not.  If the data is
-#| one-dimensional, then hbar-chart() will either produced a single stacked
-#| horizontal bar made from all data points (if $stacked is True), or one
-#| simple bar per data point (if $stacked is False), separated by $bar-spacing
-#| rows containing only chart lines.
-#|
-#| If the data is two-dimensional, then hbar-chart() produces either a series
-#| of stacked bars (if $stacked is True), each separated by $bar-spacing lines,
-#| or groups of simple bars packed together (if $stacked is False), with each
-#| group separated by $bar-spacing lines containing only chart lines.
+# Render the bars for a horizontal bar chart, padded out to $width, and
+# optionally with chart lines drawn at an interval of $lines-every character
+# cells.  $min is the value at the left end of each bar, and $max the value at
+# the far right (including the padding).
+#
+# hbar-chart() works in four modes, depending on whether the data is one- or
+# two-dimensional, and whether $stacked is True or not.  If the data is
+# one-dimensional, then hbar-chart() will either produced a single stacked
+# horizontal bar made from all data points (if $stacked is True), or one
+# simple bar per data point (if $stacked is False), separated by $bar-spacing
+# rows containing only chart lines.
+#
+# If the data is two-dimensional, then hbar-chart() produces either a series
+# of stacked bars (if $stacked is True), each separated by $bar-spacing lines,
+# or groups of simple bars packed together (if $stacked is False), with each
+# group separated by $bar-spacing lines containing only chart lines.
 sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
                Real:D :$min!, Real:D :$max! where $max > $min,
                UInt:D :$width! where * > 0, UInt :$bar-spacing = 0) is export {
