@@ -20,6 +20,10 @@ class Terminal::QuickCharts::ChartStyle {
     has Real   $.y-axis-round;           # 0 or undefined => auto
     has Real   $.y-axis-scale;           # 0 or undefined => auto
 
+    # Bar chart attributes
+    has UInt:D $.bar-spacing    = 0;
+    has UInt:D $.group-spacing  = 1;
+
     # Misc attributes
     has UInt   $.lines-every;            # Chart lines every N cells if true
     has Bool:D $.show-overflow  = True;  # Add arrows to indicate overflowed data
