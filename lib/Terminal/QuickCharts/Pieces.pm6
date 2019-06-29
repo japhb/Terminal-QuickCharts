@@ -127,7 +127,7 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
         if $cur-frac {
             my $colors  = $color ?? "$old-color on_$color" !! $old-color;
             @spans.push:  $sliver => $colors;
-            $old-val   += $cell - $cur-frac;
+            $old-val   += $cell * (1 - $cur-frac);
             $cur-frac   = 0;
             $pos++;
             next unless $cur-val > $old-val;
