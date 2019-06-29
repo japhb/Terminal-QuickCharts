@@ -2,7 +2,7 @@ use Test;
 use Terminal::QuickCharts::ChartStyle;
 
 
-plan 52;
+plan 56;
 
 
 # enum Terminal::QuickCharts::Background
@@ -25,6 +25,9 @@ sub type-check($cs, $test-set) {
         ok $cs.y-axis-round  ~~ Real,   "$test-set y-axis-round is a Real";
         ok $cs.y-axis-scale  ~~ Real,   "$test-set y-axis-scale is a Real";
 
+        ok $cs.bar-spacing   ~~ UInt:D, "$test-set bar-spacing is a defined UInt";
+        ok $cs.group-spacing ~~ UInt:D, "$test-set group-spacing is a defined UInt";
+
         ok $cs.lines-every   ~~ UInt,   "$test-set lines-every is a UInt";
         ok $cs.show-overflow ~~ Bool:D, "$test-set show-overflow is a defined Bool";
         ok $cs.show-legend   ~~ Bool:D, "$test-set show-legend is a defined Bool";
@@ -43,6 +46,9 @@ ok $cs.min-width  == 1,              "default min-width  == 1";
 ok $cs.min-height == 1,              "default min-height == 1";
 ok $cs.max-width  >= $cs.min-width,  "default max-width  >= min-width";
 ok $cs.max-height >= $cs.min-height, "default max-height == min-height";
+
+ok $cs.bar-spacing   == 0,           "default bar-spacing   == 0";
+ok $cs.group-spacing == 1,           "default group-spacing == 1";
 
 ok $cs.show-y-axis,           "default show-y-axis is True";
 ok $cs.show-legend,           "default show-legend is True";
@@ -107,6 +113,9 @@ ok $cs6.min-width     == $cs.min-width,     "empty has default min-width";
 ok $cs6.max-width     == $cs.max-width,     "empty has default max-width";
 ok $cs6.min-height    == $cs.min-height,    "empty has default min-height";
 ok $cs6.max-height    == $cs.max-height,    "empty has default max-height";
+
+ok $cs6.bar-spacing   == $cs.bar-spacing,   "empty has default bar-spacing";
+ok $cs6.group-spacing == $cs.group-spacing, "empty has default group-spacing";
 
 ok $cs6.show-y-axis   == $cs.show-y-axis,   "empty has default show-y-axis";
 ok $cs6.show-legend   == $cs.show-legend,   "empty has default show-legend";
