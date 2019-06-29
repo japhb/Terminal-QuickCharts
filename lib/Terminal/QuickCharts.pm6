@@ -274,7 +274,7 @@ Terminal::QuickCharts - Simple charts for CLI tools
 use Terminal::QuickCharts;
 
 # Chart routines take an array of data points and return an array of
-# rendered graph rows using ANSI terminal codes and Unicode block characters
+# rendered rows using ANSI terminal codes and Unicode block characters
 .say for hbar-chart([5, 10, 15]);
 
 # Horizontal bar charts support 2D data, grouping (default) or stacking the bars
@@ -282,7 +282,7 @@ use Terminal::QuickCharts;
 .say for hbar-chart([(1, 2, 3), (4, 5, 6)], :colors< red yellow blue >, :stacked);
 
 # You can also specify optional style and sizing info
-.say for hbar-chart([-7, +2, -6, +4], :min(-10), :max(10));
+.say for hbar-chart([17, 12, 16, 14], :min(10), :max(20));
 .say for smoke-chart(@lots-of-data, :style{ lines-every => 5 });
 
 # auto-chart() chooses a chart variant based on specified semantic domain,
