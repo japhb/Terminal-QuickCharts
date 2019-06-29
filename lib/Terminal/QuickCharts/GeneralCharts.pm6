@@ -34,7 +34,7 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
             my $label-delta  = $labels-every * $row-delta;
             my $pow10        = $label-delta.log10.floor;
             my $scaled       = $label-delta * 10 ** -$pow10;
-            my $nearest      = (1, 1.2, 1.5, 2, 3, 4, 5, 6, 8, 10).first(* >= $scaled);
+            my $nearest      = (1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10).first(* >= $scaled);
             my $adjusted     = $nearest * 10 ** $pow10;
             $row-delta       = $adjusted / $labels-every;
         }
