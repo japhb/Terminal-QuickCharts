@@ -157,7 +157,7 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, UInt :$lines-every,
 
 
 # Calculate the heatmap color ramp once
-# Default ramp is for white backround; reverse for black background
+# Default ramp is for white background; reverse for black background
 my @heatmap-colors =
     (5, 5, 5),                                              # White
     (5, 5, 4), (5, 5, 3), (5, 5, 2), (5, 5, 1), (5, 5, 0),  # Pale to bright yellow
