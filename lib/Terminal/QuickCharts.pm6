@@ -38,7 +38,7 @@ multi auto-chart('frame-time', @data, :$style,
             my @fps    = (1 ..^ @colors).map: { floor $target-fps / $_ };
             my @ranges = "{@fps[0]}+",
                          |(^(@colors-2) .map: { "{@fps[$_+1]}-{@fps[$_]-1}" }),
-                         "< {@fps[*-1]}";
+                         "\x3C {@fps[*-1]}";
             my @labels = @ranges.map: { "$_ fps" };
             my @key    = color-key(:@colors, :@labels);
             @graph.append: '', '   ' ~ join '  ', @key;
