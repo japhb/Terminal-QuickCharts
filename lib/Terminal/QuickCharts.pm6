@@ -97,7 +97,10 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
 
     # Make sure we have a defined ChartStyle instance
     my $s = style-with-defaults($style);
-    my $width = max 1, min $s.max-width, max $s.min-width, screen-width;
+    my $width = max 1, $s.max-width;
+
+    # A padded line to place between bars, with proper chart lines if requested
+    my $blank-line = hpad($width, :lines-every($s.lines-every));
 
     # Data is two dimensional
     if @data[0] ~~ Iterable {
@@ -105,10 +108,6 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
         if $stacked {
             $min //= 0;
             $max //= @data.map(*.grep(* > 0).sum).max;
-
-            # A padded line to place between bars, with proper chart lines if requested
-            my $blank-line = stacked-hbar([], :$min, :$max, :$width,
-                                          :lines-every($s.lines-every));
 
             my @bars = gather for @data.kv -> $i, @values {
                 take stacked-hbar(@values, :@colors, :$min, :$max, :$width,
@@ -121,10 +120,6 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
         else {
             $min //= min 0, @data.map(*.min).min;
             $max //= @data.map(*.max).max;
-
-            # A padded line to place between bars, with proper chart lines if requested
-            my $blank-line = stacked-hbar([], :$min, :$max, :$width,
-                                          :lines-every($s.lines-every));
 
             my @bars = gather for @data.kv -> $i, @values {
                 for @values.kv -> $j, $value {
@@ -152,9 +147,6 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
             $min //= min 0, @data.min;
             $max //= @data.max;
 
-            # A padded line to place between bars, with proper chart lines if requested
-            my $blank-line = stacked-hbar([], :$min, :$max, :$width,
-                                          :lines-every($s.lines-every));
 
             my @bars = gather for @data.kv -> $i, $value {
                 take hbar($value, :$min, :$max, :$width,
