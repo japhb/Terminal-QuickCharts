@@ -306,7 +306,8 @@ Terminal::QuickCharts provides a small library of simple text-output charts,
 suitable for sprucing up command-line reporting and quick analysis tools.  The
 emphasis here is more on whipuptitude, and less on manipulexity.
 
-This is a I<very> early release; expect further iteration on the APIs.
+This is a I<very> early release; expect further iteration on the APIs, and if
+time permits, bug fixes and additional chart types.
 
 =head1 AUTHOR
 
