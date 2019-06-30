@@ -8,6 +8,8 @@ use Terminal::QuickCharts::StyledPieces;
 use Terminal::QuickCharts::GeneralCharts;
 
 
+# Render a chart variant that will best represent a frame time graph, based on
+# details of the actual frame time data, and available screen size to render in
 multi auto-chart('frame-time', @data, :$style,
                  UInt:D :$target-fps = 60, Bool:D :$stats = True) is export {
 
@@ -170,6 +172,7 @@ my @heatmap-colors =
 my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
+# Render a smoke chart (good for getting general shape of a very dense dot plot)
 sub smoke-chart(@data, Real :$row-delta, :@colors, :$style,
                 Real:D :$min = min(0, @data.min), Real:D :$max = @data.max) is export {
 
@@ -227,6 +230,8 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
 }
 
 
+# Render a verticall area graph, with optional horizontal color striping to
+# indicate data bands
 sub area-graph(@data, Real :$row-delta, :$colors, :$style,
                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max) is export {
 
