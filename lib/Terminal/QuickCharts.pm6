@@ -147,7 +147,6 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
             $min //= min 0, @data.min;
             $max //= @data.max;
 
-
             my @bars = gather for @data.kv -> $i, $value {
                 take hbar($value, :$min, :$max, :$width,
                           :lines-every($s.lines-every),
@@ -195,9 +194,9 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
 
     # Convert data into pixel locations and count hits
     my @pixels = [] xx 2 * $rows;
-    for @data.kv -> $i, $value {
-        my $x = floor $x-scale * $i;
-        my $y = floor $y-scale * ($value - $min) + .5;
+    for ^@data -> int $i {
+        my $x = ($x-scale * $i).floor;
+        my $y = ($y-scale * (@data[$i] - $min) + .5).floor;
         @pixels[$y][$x]++;
     }
 
@@ -207,20 +206,21 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
     # Convert pixels into rows of colored Unicode half-height blocks
     my @rows;
     my @cell-cache;
+    my int $lines-every = $style.lines-every || 0;
     for ^$rows .reverse -> int $y {
         my $top  = @pixels[$y * 2 + 1];
         my $bot  = @pixels[$y * 2];
-        my $rule = +($style.lines-every && $y %% $style.lines-every || 0);
+        my $rule = +($lines-every && $y %% $lines-every);
         my $line = $rule ?? 'underline ' !! '';
 
-        @rows.push: join '', ^$width .map: -> int $x {
+        @rows.push: (^$width .map: -> int $x {
             my int $v1 = ceiling ($top[$x] // 0) * $scale;
             my int $v2 = ceiling ($bot[$x] // 0) * $scale;
             @cell-cache[$rule][$v1][$v2] //=
                 $v1 == $v2 ?? colored(' ', "{$line}on_" ~ pick-color(@colors, $v1)) !!
                               colored('▀',       $line  ~ pick-color(@colors, $v1) ~
                                                  ' on_' ~ pick-color(@colors, $v2))
-        }
+        }).join;
     }
 
     @rows
