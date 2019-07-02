@@ -300,6 +300,16 @@ use Terminal::QuickCharts;
 
 =end code
 
+=head1 EXAMPLES
+
+Comparing an animation's performance before and after a round of optimization:
+
+V<![performance comparison charts](https://user-images.githubusercontent.com/63550/60478723-533b2f00-9c38-11e9-9462-2ef67d1840bf.png)>
+
+Result of many small Rakudo optimizations on a standard benchmark's runtime:
+
+V<![graph of Rakudo optimization results](https://user-images.githubusercontent.com/63550/60484089-0746b500-9c4d-11e9-87fe-4ac4c032ba5e.png)>
+
 =head1 DESCRIPTION
 
 Terminal::QuickCharts provides a small library of simple text-output charts,

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/japhb/Terminal-QuickCharts.svg?branch=master)](https://travis-ci.org/japhb/Terminal-QuickCharts)
+
 NAME
 ====
 
@@ -25,6 +27,17 @@ use Terminal::QuickCharts;
 # details of the actual data, and available screen size
 .say for auto-chart('frame-time', @frame-times);
 ```
+
+EXAMPLES
+========
+
+Comparing an animation's performance before and after a round of optimization:
+
+![performance comparison charts](https://user-images.githubusercontent.com/63550/60478723-533b2f00-9c38-11e9-9462-2ef67d1840bf.png)
+
+Result of many small Rakudo optimizations on a standard benchmark's runtime:
+
+![graph of Rakudo optimization results](https://user-images.githubusercontent.com/63550/60484089-0746b500-9c4d-11e9-87fe-4ac4c032ba5e.png)
 
 DESCRIPTION
 ===========
