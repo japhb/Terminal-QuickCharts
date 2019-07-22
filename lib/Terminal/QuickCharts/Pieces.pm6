@@ -9,6 +9,57 @@ use Terminal::QuickCharts::Helpers;
 # XXXX: What about RTL (Right To Left) languages and charts?
 
 
+#| Figure out reasonable defaults for numeric axis unit/rounding/scaling.
+sub default-numeric-scaling(Real:D :$min!, Real:D :$max!,
+                            Real :$scale is copy, Real :$round is copy,
+                            Str:D :$unit is copy = '',
+                            Bool:D :$binary = False) is export {
+    my $scale-by = $binary ?? 1024 !! 1000;
+    my $max-abs  = max $min.abs, $max.abs;
+    my $delta    = abs($max - $min);
+
+    my @prefixes = |< y z a f p n μ m >, '', |< k M G T P E Z Y >;
+    my $index    = @prefixes.first: !*, :k;
+    @prefixes[$index + 1] .= uc if $binary;
+
+    unless $scale {
+        $scale = 1;
+        while $max-abs * $scale > $scale-by {
+            $scale /= $scale-by;
+            $index++;
+            last if $index >= @prefixes - 1;
+        }
+        while $max-abs && $max-abs * $scale < 1 {
+            $scale *= $scale-by;
+            $index--;
+            last if $index <= 0;
+        }
+    }
+
+    $round ||= $delta && $delta * $scale <= 20 ?? .1 !! 1;
+    $unit    = @prefixes[$index] ~ ('i' if $binary) ~ $unit;
+
+    { :$unit, :$round, :$scale }
+}
+
+
+#| Render the text for a numeric label, including scaling and rounding
+#| the value, and appending a unit if any.
+sub numeric-label(Real:D $value, Real :$scale, Real :$round, Str :$unit) is export {
+    my $val = $value * ($scale || 1);
+
+    if $round {
+        $val .= round($round);
+        if $round < 1 {
+            my $digits = -($round.log10.floor);
+            $val .= fmt("%.{$digits}f");
+        }
+    }
+
+    $unit ?? "$val $unit" !! $val
+}
+
+
 #| Render a color key for the colors in a chart, returning a list of ANSI
 #| colored strings, each with a colored bar and a label.  Several variants
 #| exist for different ways of specifying the colors and their matching

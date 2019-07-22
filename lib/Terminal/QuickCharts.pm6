@@ -29,7 +29,7 @@ multi auto-chart('frame-time', @data, :$style,
     my $row-delta = 1 / $target-fps;
     my $width     = screen-width;
     if $s.show-y-axis {
-        my $max-label   = numeric-label($max, $s);
+        my $max-label   = y-axis-numeric-label($max, $s);
         my $label-width = ($max-label ~ '▕').chars;
         $width -= $label-width;
     }

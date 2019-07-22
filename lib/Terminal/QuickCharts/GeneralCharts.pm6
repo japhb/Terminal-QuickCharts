@@ -54,8 +54,8 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
 
     # Determine max label width, if y-axis labels are actually desired,
     # and set content width to match
-    my $label-width = max numeric-label($cap, $s).chars,
-                          numeric-label($min, $s).chars;
+    my $label-width = max y-axis-numeric-label($cap, $s).chars,
+                          y-axis-numeric-label($min, $s).chars;
     my $max-width = $s.max-width - $s.show-y-axis * ($label-width + 1);
     my $width     = max 1, min $max-width, max $s.min-width, +@data;
 
@@ -70,7 +70,7 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
             my $row   = $rows - 1 - $_;
             my $value = $row * $row-delta + $min;
             my $show  = $row %% $labels-every;
-            my $label = $show ?? numeric-label($value, $s) !! '';
+            my $label = $show ?? y-axis-numeric-label($value, $s) !! '';
             @rows[$_] = sprintf("%{$label-width}s▕", $label) ~ @rows[$_];
         }
     }
