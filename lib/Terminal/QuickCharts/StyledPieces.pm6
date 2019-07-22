@@ -17,15 +17,13 @@ sub default-y-scaling(Real:D :$min!, Real:D :$max!,
     my $index    = @prefixes.first: !*, :k;
     unless $scale {
         $scale = 1;
-        while $max-abs > $scale-by {
-            $max-abs /= $scale-by;
-            $scale   /= $scale-by;
+        while $max-abs * $scale > $scale-by {
+            $scale /= $scale-by;
             $index++;
             last if $index >= @prefixes - 1;
         }
-        while $max-abs && $max-abs < 1 {
-            $max-abs *= $scale-by;
-            $scale   *= $scale-by;
+        while $max-abs && $max-abs * $scale < 1 {
+            $scale *= $scale-by;
             $index--;
             last if $index <= 0;
         }
