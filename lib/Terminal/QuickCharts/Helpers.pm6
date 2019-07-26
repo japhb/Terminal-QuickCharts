@@ -32,6 +32,16 @@ sub screen-width(--> UInt:D) is export {
 }
 
 
+#| Round up an interval size to have convenient spacing, so that each value
+#| will be short and sensible to humans when printed in decimal.
+sub friendly-interval(Real:D $raw --> Real:D) is export {
+    my $pow10    = $raw.log10.floor;
+    my $scaled   = $raw * 10 ** -$pow10;
+    my $nearest  = (1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10).first(* >= $scaled);
+    my $adjusted = $nearest * 10 ** $pow10;
+}
+
+
 #| Pick a color using a color rule and an item.  The color rule can be any of
 #| the following:
 #|

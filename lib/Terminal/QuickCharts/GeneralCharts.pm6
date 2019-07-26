@@ -32,11 +32,7 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
         if $s.show-y-axis {
             my $labels-every = $s.lines-every || min 8, ($rows / 5).ceiling;
             my $label-delta  = $labels-every * $row-delta;
-            my $pow10        = $label-delta.log10.floor;
-            my $scaled       = $label-delta * 10 ** -$pow10;
-            my $nearest      = (1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10).first(* >= $scaled);
-            my $adjusted     = $nearest * 10 ** $pow10;
-            $row-delta       = $adjusted / $labels-every;
+            $row-delta       = friendly-interval($label-delta) / $labels-every;
         }
     }
     my $cap = $rows * $row-delta + $min;
