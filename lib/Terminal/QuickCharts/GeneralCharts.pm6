@@ -12,20 +12,21 @@ use Terminal::QuickCharts::StyledPieces;
 #| actual chart content rendering is handed off to &content, while sizing
 #| computations and axis/label rendering is done in this common code.
 sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :$min!,
-                           Real:D :$max!, :$style!, :&content!) is export {
+                           Real:D :$max!, :$style!, :&content!, :@labels, :&labeler) is export {
 
     # Make sure we have a defined ChartStyle instance
     my $s = style-with-defaults($style);
 
     # Basic sizing
-    my $delta = $max - $min;
+    my $max-height = $s.max-height - $s.show-x-axis;
+    my $delta      = $max - $min;
     my $rows;
     if $row-delta {
-        $rows = max 1, min $s.max-height, max $s.min-height,
-                                              ceiling($delta / $row-delta);
+        $rows = max 1, min $max-height, max $s.min-height,
+                                            ceiling($delta / $row-delta);
     }
     else {
-        $rows = max 1, $s.max-height;
+        $rows = max 1, $max-height;
         $row-delta = $delta / $rows;
 
         # Auto-adjust row-delta to make convenient labels
@@ -46,7 +47,7 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
     }
 
     # Compute and apply scaling defaults
-    $s = style-with-defaults($s, default-y-scaling(:$min, :max($cap), :style($s)));
+    $s .= clone(|default-y-scaling(:$min, :max($cap), :style($s)));
 
     # Determine max label width, if y-axis labels are actually desired,
     # and set content width to match
@@ -69,6 +70,28 @@ sub general-vertical-chart(@data, Real :$row-delta! is copy, :$colors!, Real:D :
             my $label = $show ?? y-axis-numeric-label($value, $s) !! '';
             @rows[$_] = sprintf("%{$label-width}s▕", $label) ~ @rows[$_];
         }
+    }
+
+    # Add the x-axis and labels if desired
+    if $s.show-x-axis && &labeler {
+        my $x-labels   = ' ' x $width;
+        my @positioned = labeler(@data, :@labels, :$width, :style($s));
+
+        for @positioned -> $ (:key($label), :value($pos)) {
+            last if $pos >= $width;
+
+            $x-labels.substr-rw($pos - 1, 1) = '…'
+                if $pos && $x-labels.substr($pos, 1) ne ' ';
+            $x-labels.substr-rw($pos, $label.chars + 1) = '└' ~ $label;
+        }
+
+        if $x-labels.chars > $width {
+            $x-labels.substr-rw($width - 1, 1) = '…';
+            $x-labels .= substr(0, $width);
+        }
+
+        $x-labels [R~]= ' ' x $s.show-y-axis * ($label-width + 1);
+        @rows.push: $x-labels;
     }
 
     @rows;
