@@ -308,7 +308,7 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
 }
 
 
-# Render a verticall area graph, with optional horizontal color striping to
+# Render a vertical area graph, with optional horizontal color striping to
 # indicate data bands
 sub area-graph(@data, Real :$row-delta, :$colors, :$style,
                Real:D :$min = min(0, @data.min), Real:D :$max = @data.max) is export {
