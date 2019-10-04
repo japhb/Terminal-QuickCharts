@@ -12,18 +12,20 @@ sub MAIN(Str $variant = 'test-t', Str :$timings-file = 'speed-all.log') {
     }
 
     my regex timing-line {
-        ^   \d\d\d\d\-\d\d\-\d\d  # date
-        \s+ \d\d\:\d\d\:\d\d      # time
-        \s+ (.*?)                 # test
-        \s+ (\d+\.\d+) $          # seconds
+        ^   (\d\d\d\d\-\d\d\-\d\d)  # date
+        \s+ \d\d\:\d\d\:\d\d        # time
+        \s+ (.*?)                   # test
+        \s+ (\d+\.\d+) $            # seconds
     }
 
-    my @timings = gather for $timings-file.IO.lines {
+    my (@timings, @labels);
+    for $timings-file.IO.lines {
         next unless .contains($variant);
-        if .match(&timing-line) {
-            take +~$1 if $0 eq $variant;
+        if .match(&timing-line) && $1 eq $variant && ~$2 ne '999.999' {
+            @labels.push:  Date.new(~$0);
+            @timings.push: +~$2;
         }
     }
 
-    .say for smoke-chart @timings;
+    .say for smoke-chart @timings, :@labels, :style{ y-axis-unit => 's' };
 }
