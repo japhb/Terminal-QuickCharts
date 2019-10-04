@@ -173,14 +173,92 @@ my @heatmap-ramp = @heatmap-colors.map: { ~(16 + 36 * .[0] + 6 * .[1] + .[2]) }
 
 
 # Render a smoke chart (good for getting general shape of a very dense dot plot)
-sub smoke-chart(@data, Real :$row-delta, :@colors, :$style,
+sub smoke-chart(@data, Real :$row-delta, :@colors, :@labels, :$style,
                 Real:D :$min = min(0, @data.min), Real:D :$max = @data.max) is export {
 
     my $s = style-with-defaults($style);
     @colors ||= $s.background == Dark ?? @heatmap-ramp.reverse !! @heatmap-ramp;
 
-    general-vertical-chart(@data, :$row-delta, :@colors, :$min, :$max, :style($s),
-                           :content(&smoke-chart-content))
+    general-vertical-chart(@data, :$row-delta, :@colors, :@labels, :$min, :$max, :style($s),
+                           :content(&smoke-chart-content),
+                           :labeler(&smoke-chart-labeler))
+}
+
+# Internal sub, generating just the X axis labels and label locations
+sub smoke-chart-labeler(@data, :@labels, UInt:D :$width!, ChartStyle:D :$style!) {
+    if @labels && @labels[0] ~~ Dateish {
+        my $long-year  = @labels[0,*-1].map(*.year.chars).max;
+        my $max-years  = ($width / ($long-year + 1)).floor;
+        my $max-months = ($width / ($long-year + 4)).floor;
+        my $max-dates  = ($width / ($long-year + 7)).floor;
+
+        my $years  = @labels[*-1].year  - @labels[0].year;
+        my $months = @labels[*-1].month - @labels[0].month + $years * 12;
+        my $days   = @labels[*-1].Date  - @labels[0].Date;
+
+        my $interval  = 1;
+        my $unit      = 'days';
+        my &formatter = *.yyyy-mm-dd;
+
+        if $months / 6 >= $max-months {
+            $unit      = 'years';
+            &formatter = ~*.year;
+            $interval *= 10 while $years / ($interval * 10) >= $max-years;
+            $interval *=  5 if    $years / ($interval *  5) >= $max-years;
+
+            my $int    = $interval;
+            $interval += $int while $years / $interval > $max-years;
+        }
+        elsif $months / 3 >= $max-months {
+            $unit      = 'months';
+            $interval  = 6;
+            &formatter = { .year ~ (.month < 7 ?? ' H1' !! ' H2') };
+        }
+        elsif $months >= $max-months {
+            $unit      = 'months';
+            $interval  = 3;
+            &formatter = { .year ~ ' Q' ~ (.month / 3).ceiling };
+        }
+        elsif $days >= $max-dates {
+            $unit      = 'months';
+            &formatter = { .year ~ .month.fmt('-%02d') };
+        }
+
+        my $date = @labels[0].truncated-to($unit).Date;
+        if $interval > 1 {
+            if $unit eq 'years' {
+                my $year  = $date.year - $date.year % $interval;
+                $date     = Date.new(:$year);
+            }
+            else {
+                my $month = $date.month - 1;
+                $month   -= $month % $interval;
+                $date     = Date.new(:year($date.year), :month($month + 1));
+            }
+        }
+
+        my $start = @labels[0].Date;
+        my $end   = @labels[*-1].Date;
+
+        my @positioned = gather while $date <= $end {
+            my $pos = floor $width * ($date - $start) / ($end - $start);
+            take formatter($date) => $pos if $pos >= 0;
+            $date .= later: |($unit => $interval);
+        }
+    }
+    else {
+        my $cell-delta   = @data / $width;
+        my $labels-every = ($style.lines-every || 0) * 2 || min 12, ($width / 5).ceiling;
+        my $label-delta  = $labels-every * $cell-delta;
+        my $interval     = friendly-interval($label-delta);
+        my $x-scale      = $width / (@data || 1);
+
+        my @positioned   = (0, $interval ...^ * >= @data).map: {
+            ~(@labels[$_] // $_) => ($_ * $x-scale).floor
+        };
+
+        @positioned
+    }
 }
 
 
