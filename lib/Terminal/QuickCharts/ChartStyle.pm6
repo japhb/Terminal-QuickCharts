@@ -14,6 +14,9 @@ class Terminal::QuickCharts::ChartStyle {
     has UInt:D $.min-height     = 1;
     has UInt:D $.max-height     = screen-height() - 1;
 
+    # X Axis attributes
+    has Bool:D $.show-x-axis    = True;
+
     # Y Axis attributes
     has Bool:D $.show-y-axis    = True;
     has Str:D  $.y-axis-unit    = '';
