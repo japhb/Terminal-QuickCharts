@@ -287,7 +287,7 @@ sub smoke-chart-content(@data, UInt:D :$rows!, Real:D :$row-delta!,
     # Convert pixels into rows of colored Unicode half-height blocks
     my @rows;
     my @cell-cache;
-    my int $lines-every = $style.lines-every || 0;
+    my int $lines-every = $style.lines-every || $style.show-x-axis && 1_000_000 || 0;
     for ^$rows .reverse -> int $y {
         my $top  = @pixels[$y * 2 + 1];
         my $bot  = @pixels[$y * 2];
