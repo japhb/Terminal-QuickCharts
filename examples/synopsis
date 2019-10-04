@@ -27,7 +27,7 @@ sub MAIN() {
     .say for hbar-chart([17, 12, 16, 14], :min(10), :max(20));
 
     say "\nStyled smoke chart:";
-    .say for smoke-chart(@lots-of-data, :style{ lines-every => 5, max-height => 10 });
+    .say for smoke-chart(@lots-of-data, :style{ lines-every => 5, max-height => 11 });
 
     # auto-chart() chooses a chart variant based on specified semantic domain,
     # details of the actual data, and available screen size
