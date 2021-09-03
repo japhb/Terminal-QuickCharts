@@ -1,26 +1,30 @@
 {
-  "authors" : [
+  "authors": [
     "Geoffrey Broadwell"
   ],
-  "build-depends" : [ ],
-  "depends" : [
+  "build-depends": [
+  ],
+  "depends": [
     "Terminal::ANSIColor"
   ],
-  "description" : "Simple charts for CLI tools",
-  "license" : "Artistic-2.0",
-  "name" : "Terminal::QuickCharts",
-  "perl" : "6.c",
-  "provides" : {
-    "Terminal::QuickCharts" : "lib/Terminal/QuickCharts.pm6",
-    "Terminal::QuickCharts::ChartStyle" : "lib/Terminal/QuickCharts/ChartStyle.pm6",
-    "Terminal::QuickCharts::GeneralCharts" : "lib/Terminal/QuickCharts/GeneralCharts.pm6",
-    "Terminal::QuickCharts::Helpers" : "lib/Terminal/QuickCharts/Helpers.pm6",
-    "Terminal::QuickCharts::Pieces" : "lib/Terminal/QuickCharts/Pieces.pm6",
-    "Terminal::QuickCharts::StyledPieces" : "lib/Terminal/QuickCharts/StyledPieces.pm6"
+  "description": "Simple charts for CLI tools",
+  "license": "Artistic-2.0",
+  "name": "Terminal::QuickCharts",
+  "perl": "6.c",
+  "provides": {
+    "Terminal::QuickCharts": "lib/Terminal/QuickCharts.pm6",
+    "Terminal::QuickCharts::ChartStyle": "lib/Terminal/QuickCharts/ChartStyle.pm6",
+    "Terminal::QuickCharts::GeneralCharts": "lib/Terminal/QuickCharts/GeneralCharts.pm6",
+    "Terminal::QuickCharts::Helpers": "lib/Terminal/QuickCharts/Helpers.pm6",
+    "Terminal::QuickCharts::Pieces": "lib/Terminal/QuickCharts/Pieces.pm6",
+    "Terminal::QuickCharts::StyledPieces": "lib/Terminal/QuickCharts/StyledPieces.pm6"
   },
-  "resources" : [ ],
-  "source-url" : "https://github.com/japhb/Terminal-QuickCharts.git",
-  "tags" : [ ],
-  "test-depends" : [ ],
-  "version" : "0.0.1"
+  "resources": [
+  ],
+  "source-url": "https://github.com/japhb/Terminal-QuickCharts.git",
+  "tags": [
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
 }
