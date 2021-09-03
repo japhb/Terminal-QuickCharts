@@ -52,6 +52,7 @@ multi auto-chart('frame-time', @data, :$style,
     }
 
     if $stats {
+        # Min, mean, max
         my ($frames, $min, $sum) = +@data, @data.min, @data.sum;
         if 0 < all($frames, $min, $max, $sum) {
             my $ave       = $sum / $frames;
@@ -69,6 +70,20 @@ multi auto-chart('frame-time', @data, :$style,
                                $max * 1000, $min-fps);
             @graph.append: '', $info;
         }
+
+        # Percentiles
+        my @sorted   = @data.sort;
+        my @percents = .50, .75, .90, .95, .99;
+        my @pctiles  = @percents.map({ @sorted[floor $_ * @sorted] });
+        my @colored;
+        for @percents Z @pctiles -> ($pct, $pctile) {
+            my $fps   = 1 / ($pctile || 1);
+            my $color = pick-color(@colors, floor($pctile * $target-fps));
+            my $info  = sprintf('%d%%: %.1f ms', $pct * 100, $pctile * 1000);
+            @colored.push: colored($info, $color);
+        }
+        my $percent-info = @colored.join(' - ');
+        @graph.append: $percent-info;
     }
 
     @graph
