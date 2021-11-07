@@ -371,7 +371,7 @@ Terminal::QuickCharts - Simple charts for CLI tools
 
 =head1 SYNOPSIS
 
-=begin code :lang<perl6>
+=begin code :lang<raku>
 
 use Terminal::QuickCharts;
 

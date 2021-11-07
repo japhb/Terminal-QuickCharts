@@ -6,7 +6,7 @@ Terminal::QuickCharts - Simple charts for CLI tools
 SYNOPSIS
 ========
 
-```perl6
+```raku
 use Terminal::QuickCharts;
 
 # Chart routines take an array of data points and return an array of
