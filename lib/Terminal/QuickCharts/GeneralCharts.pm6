@@ -2,7 +2,6 @@
 
 unit module Terminal::QuickCharts::GeneralCharts;
 
-use Terminal::ANSIColor;
 use Terminal::QuickCharts::Helpers;
 use Terminal::QuickCharts::ChartStyle;
 use Terminal::QuickCharts::StyledPieces;
