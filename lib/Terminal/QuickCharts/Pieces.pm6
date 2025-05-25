@@ -95,24 +95,20 @@ multi color-key(@pairs --> Iterable) {
 sub hpad(
   Int:D  $pad-length,
   UInt  :$lines-every,
-  UInt  :$pos                  = 0,
-  Str   :$char         is copy = ' ',
-
+  UInt  :$pos          = 0
   --> Str:D
 )
   is export
 {
-    $char = $char.comb.head if $char.chars > 1;
-
     return '' unless $pad-length > 0;
 
-    my $pad = $char x $pad-length;
+    my $pad = ' ' x $pad-length;
     if $pad-length && $lines-every {
         my $offset = $pos % $lines-every;
         my $start  = $offset ?? $lines-every - $offset !! 0;
         for $start, $start + $lines-every ... * {
             last if $_ > $pad-length - 1;
-            $pad.substr-rw($_, 1) = '▏';
+            $pad.substr-rw($_, 1) = '▏'
         }
     }
 
@@ -127,8 +123,7 @@ sub hpad(
 #| optionally colored $color.
 sub hbar(Real:D $value, :$color, UInt :$lines-every,
          Real:D :$min!, Real:D :$max! where $max > $min,
-         UInt:D :$width! where * > 0,
-         Str    :$empty = ' ' --> Str:D) is export {
+         UInt:D :$width! where * > 0 --> Str:D) is export {
 
     $value <= $min ?? hpad($width, :$lines-every, :pos(0)) !!
     $value >= $max ?? colorize('█' x $width, $color)       !!
@@ -138,15 +133,14 @@ sub hbar(Real:D $value, :$color, UInt :$lines-every,
         my $frac8 = (($pos - $pos.floor) * 8).floor;
         my $bar   = '█' x $pos.floor
                   ~ ((0x2590 - $frac8).chr if $frac8);
-                  
+
         my $pad   = hpad(
            $width - $bar.chars,
           :$lines-every,
-          :pos($bar.chars),
-          :char($empty)
+          :pos($bar.chars)
         );
 
-        (colorize($bar, $color) if $bar) ~ $pad
+        (colorize($bar, $color) if $bar) ~ (colorize($pad, $color) if $pad)
     }
 }
 
