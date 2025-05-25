@@ -2,6 +2,7 @@
 
 use v6;
 use Terminal::QuickCharts;
+use Terminal::QuickCharts::ChartStyle;
 
 
 #| Examples from the main module SYNOPSIS section
@@ -28,6 +29,8 @@ sub MAIN() {
 
     say "\nStyled smoke chart:";
     .say for smoke-chart(@lots-of-data, :style{ lines-every => 5, max-height => 11 });
+    .say for smoke-chart(@lots-of-data, :style{ lines-every => 5, max-height => 11,
+                                                background => Light });
 
     # auto-chart() chooses a chart variant based on specified semantic domain,
     # details of the actual data, and available screen size
