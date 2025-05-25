@@ -108,7 +108,7 @@ multi auto-chart('frame-time', @data, :$style,
 # each bar separated by $style.bar-spacing lines containing only chart lines,
 # and each group separated by $style.group-spacing chart line only lines.
 sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
-               Real :$min is copy, Real :$max is copy, Str :$empty) is export {
+               Real :$min is copy, Real :$max is copy) is export {
 
     return unless @data;
 
@@ -140,7 +140,7 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
 
             my @bars = gather for @data.kv -> $i, @values {
                 for @values.kv -> $j, $value {
-                    take hbar($value, :$min, :$max, :$width, :$empty,
+                    take hbar($value, :$min, :$max, :$width,
                               :lines-every($s.lines-every),
                               :color(pick-color(@colors, $j)));
                     take $blank-line for ^$s.bar-spacing;
