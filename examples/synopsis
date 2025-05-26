@@ -16,12 +16,17 @@ sub MAIN() {
     say "\nBasic horizontal bar chart:";
     .say for hbar-chart([5, 10, 15]);
 
+    say "\nSame chart, but with dark grey background and red chart lines:";
+    .say for hbar-chart([5, 10, 15], :style{ lines-every => 10 },
+                        bg-color => 235, line-color => 'red');
+
     # Horizontal bar charts support 2D data, grouping (default) or stacking the bars
     say "\nGrouped system-colored horizontal bar chart:";
     .say for hbar-chart([(1, 2, 3), (4, 5, 6)], :colors< red yellow blue >);
 
     say "\nStacked pastel-colored horizontal bar chart:";
-    .say for hbar-chart([(1, 2, 3), (4, 5, 6)], :colors< 210 229 147 >, :stacked);
+    .say for hbar-chart([(1, 2, 3), (4, 5, 6)], :stacked,
+                        :colors< 210 229 147 >, :bg-color(237));
 
     # You can also specify optional style and sizing info
     say "\nManually sized horizontal bar chart:";
