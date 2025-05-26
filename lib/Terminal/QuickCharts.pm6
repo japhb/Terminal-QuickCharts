@@ -1,4 +1,4 @@
-unit module Terminal::QuickCharts:ver<0.0.1>;
+unit module Terminal::QuickCharts:ver<0.0.2>;
 
 use Terminal::ANSIColor;
 use Terminal::QuickCharts::Helpers;

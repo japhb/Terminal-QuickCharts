@@ -1,6 +1,8 @@
 Revision history for Terminal-QuickCharts
 
 {{$NEXT}}
+
+0.0.2  2025-05-25T19:05:38-07:00
   [Features]
   - Support background and line color options for bar chart pieces (API is solid)
   - Support same in full hbar-chart (API may change)
