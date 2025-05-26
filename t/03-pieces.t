@@ -60,6 +60,7 @@ is hpad(3, :lines-every(2), :pos(4)), '▏ ▏', 'hpad with all: lines-every 2, 
 is hpad(3, :lines-every(3), :pos(4)), '  ▏', 'hpad with all: lines-every 3, pos 4';
 is hpad(3, :lines-every(4), :pos(4)), '▏  ', 'hpad with all: lines-every 4, pos 4';
 
+# XXXX: hpad with color and/or line-color
 
 # color-key(@pairs)
 is-deeply color-key([]), (), 'color-key(empty @pairs)';
@@ -153,6 +154,7 @@ is-deeply gather { take hbar($_, :color<blue>, :min(-1), :max(3), :width(4), :li
 "\e[34m████\e[0m"),
 "Correct hbar lengths for normal use";
 
+# XXXX: hbar with bg-color and/or line-color
 
 # stacked-hbar(@values, :@colors, :$lines-every, :$min!, :$max!, :$width!)
 is stacked-hbar([], :min(-1), :max(17), :width(5)), hpad(5), "stacked-hbar([])";
@@ -205,6 +207,8 @@ subtest "stacked-hbar(2 values, 1 color) eq hbar", {
 # XXXX: Test that stacked-hbar with 2 values and 2+ colors produces a sensible result
 
 # XXXX: Test that stacked-hbar with 3+ values and 2+ colors produces a sensible result
+
+# XXXX: stacked-hbar with bg-color and/or line-color
 
 
 done-testing;
