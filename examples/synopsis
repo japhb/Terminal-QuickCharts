@@ -9,7 +9,7 @@ use Terminal::QuickCharts::ChartStyle;
 sub MAIN() {
     # Sample data
     my @lots-of-data = (1.rand xx 10000).map: * ** (1/6);
-    my @frame-times  = (1.rand xx    70).map: * ** 5 / 15 + 1/100;
+    my @frame-times  = (1.rand xx    70).map: * ** 5 / 15 + 1/200;
 
     # Chart routines take an array of data points and return an array of
     # rendered rows using ANSI terminal codes and Unicode block characters
@@ -17,23 +17,28 @@ sub MAIN() {
     .say for hbar-chart([5, 10, 15]);
 
     # Horizontal bar charts support 2D data, grouping (default) or stacking the bars
-    say "\nGrouped colored horizontal bar chart:";
+    say "\nGrouped system-colored horizontal bar chart:";
     .say for hbar-chart([(1, 2, 3), (4, 5, 6)], :colors< red yellow blue >);
 
-    say "\nStacked colored horizontal bar chart:";
-    .say for hbar-chart([(1, 2, 3), (4, 5, 6)], :colors< red yellow blue >, :stacked);
+    say "\nStacked pastel-colored horizontal bar chart:";
+    .say for hbar-chart([(1, 2, 3), (4, 5, 6)], :colors< 210 229 147 >, :stacked);
 
     # You can also specify optional style and sizing info
     say "\nManually sized horizontal bar chart:";
-    .say for hbar-chart([17, 12, 16, 14], :min(10), :max(20));
+    .say for hbar-chart([17, 12, 16, 14], :colors< 196 215 73 133 >, :min(10), :max(20));
 
     say "\nStyled smoke chart:";
     .say for smoke-chart(@lots-of-data, :style{ lines-every => 5, max-height => 11 });
+
+    say "\nSame smoke chart, but with Light background theme:";
     .say for smoke-chart(@lots-of-data, :style{ lines-every => 5, max-height => 11,
                                                 background => Light });
 
     # auto-chart() chooses a chart variant based on specified semantic domain,
     # details of the actual data, and available screen size
-    say "\nFrame time auto-chart:";
+    say "\nFrame time auto-chart, with default 60 fps target:";
     .say for auto-chart('frame-time', @frame-times);
+
+    say "\nSame frame time auto-chart, but with 120 fps target:";
+    .say for auto-chart('frame-time', @frame-times, target-fps => 120);
 }
