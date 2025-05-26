@@ -92,8 +92,12 @@ multi color-key(@pairs --> Iterable) {
 #| Render a single span of horizontal chart padding, optionally with chart
 #| lines added every $lines-every columns, with chart line phase determined by
 #| $pos (usually the visual width of whatever was to the left of the padding).
-sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) is export {
+sub hpad(Int:D $pad-length, :$color is copy, :$line-color,
+         UInt :$lines-every, UInt :$pos = 0 --> Str:D) is export {
     return '' unless $pad-length > 0;
+
+    $color = $color ?? ($line-color ?? "$line-color on_$color" !! "on_$color")
+                    !! ($line-color ??  $line-color            !! '');
 
     my $pad = ' ' x $pad-length;
     if $pad-length && $lines-every {
@@ -105,7 +109,7 @@ sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) is exp
         }
     }
 
-    $pad
+    colorize($pad, $color)
 }
 
 
@@ -114,19 +118,24 @@ sub hpad(Int:D $pad-length, UInt :$lines-every, UInt :$pos = 0 --> Str:D) is exp
 #| character cells.  $min is the value at the left end, and $max the value at
 #| the far right (including the padding).  The solid bar segment can be
 #| optionally colored $color.
-sub hbar(Real:D $value, :$color, UInt :$lines-every,
+sub hbar(Real:D $value, :$color is copy, :$bg-color, :$line-color,
+         UInt :$lines-every,
          Real:D :$min!, Real:D :$max! where $max > $min,
          UInt:D :$width! where * > 0 --> Str:D) is export {
 
-    $value <= $min ?? hpad($width, :$lines-every, :pos(0)) !!
-    $value >= $max ?? colorize('█' x $width, $color)       !!
+    $value <= $min ?? hpad($width, :$lines-every, :pos(0),
+                           :color($bg-color), :$line-color) !!
+    $value >= $max ?? colorize('█' x $width, $color)        !!
     do {
+        $color  //= '';
+        $color    = "on_$bg-color $color" if $bg-color;
         my $cell  = ($max - $min) / $width;
         my $pos   = ($value - $min) / $cell;
         my $frac8 = (($pos - $pos.floor) * 8).floor;
         my $bar   = '█' x $pos.floor
                   ~ ((0x2590 - $frac8).chr if $frac8);
-        my $pad   = hpad($width - $bar.chars, :$lines-every, :pos($bar.chars));
+        my $pad   = hpad($width - $bar.chars, :color($bg-color), :$line-color,
+                         :$lines-every, :pos($bar.chars));
 
         (colorize($bar, $color) if $bar) ~ $pad
     }
@@ -138,7 +147,7 @@ sub hbar(Real:D $value, :$color, UInt :$lines-every,
 #| $width, optionally with chart lines drawn at an interval of $lines-every
 #| character cells.  $min is the value at the left end, and $max the value at
 #| the far right (including the padding).
-sub stacked-hbar(@values, :@colors, UInt :$lines-every,
+sub stacked-hbar(@values, :@colors, :$bg-color, :$line-color, UInt :$lines-every,
                  Real:D :$min!, Real:D :$max! where $max > $min,
                  UInt:D :$width! where * > 0 --> Str:D) is export {
 
@@ -209,13 +218,15 @@ sub stacked-hbar(@values, :@colors, UInt :$lines-every,
 
     # Possibly a leftover sliver from last bar
     if $cur-frac {
+        $old-color = "$old-color on_$bg-color" if $bg-color;
         @spans.push: $sliver => $old-color;
         $pos++;
     }
 
     # If bar is too short, pad it
     my $pad-length = $width - $pos;
-    my $pad = hpad($pad-length, :$lines-every, :$pos);
+    my $pad = hpad($pad-length, :$lines-every, :$pos,
+                   :color($bg-color), :$line-color);
 
     join-colorized-spans(@spans) ~ $pad
 }
