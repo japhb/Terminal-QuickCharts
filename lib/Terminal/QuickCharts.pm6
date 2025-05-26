@@ -107,7 +107,8 @@ multi auto-chart('frame-time', @data, :$style,
 # lines, or groups of simple bars packed together (if $stacked is False), with
 # each bar separated by $style.bar-spacing lines containing only chart lines,
 # and each group separated by $style.group-spacing chart line only lines.
-sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
+sub hbar-chart(@data, :@colors, :$bg-color is copy, :$line-color is copy,
+               Bool :$stacked, :$style,
                Real :$min is copy, Real :$max is copy) is export {
 
     return unless @data;
@@ -116,8 +117,15 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
     my $s = style-with-defaults($style);
     my $width = max 1, $s.max-width;
 
+    # Default background and line colors depending on background style
+    if $s.background == Light {
+        $bg-color   //= 'white';
+        $line-color //= 'black';
+    }
+
     # A padded line to place between bars, with proper chart lines if requested
-    my $blank-line = hpad($width, :lines-every($s.lines-every));
+    my $blank-line = hpad($width, :lines-every($s.lines-every),
+                          :color($bg-color), :$line-color);
 
     # Data is two dimensional
     if @data[0] ~~ Iterable {
@@ -127,7 +135,8 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
             $max //= @data.map(*.grep(* > 0).sum).max;
 
             my @bars = gather for @data.kv -> $i, @values {
-                take stacked-hbar(@values, :@colors, :$min, :$max, :$width,
+                take stacked-hbar(@values, :@colors, :$bg-color, :$line-color,
+                                  :$min, :$max, :$width,
                                   :lines-every($s.lines-every));
                 last if $i == @data.end;
                 take $blank-line for ^$s.bar-spacing;
@@ -142,6 +151,7 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
                 for @values.kv -> $j, $value {
                     take hbar($value, :$min, :$max, :$width,
                               :lines-every($s.lines-every),
+                              :$bg-color, :$line-color,
                               :color(pick-color(@colors, $j)));
                     take $blank-line for ^$s.bar-spacing;
                 }
@@ -156,7 +166,8 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
         if $stacked {
             $min //= 0;
             $max //= @data.grep(* > 0).sum;
-            stacked-hbar(@data, :@colors, :$min, :$max, :$width,
+            stacked-hbar(@data, :@colors, :$bg-color, :$line-color,
+                         :$min, :$max, :$width,
                          :lines-every($s.lines-every)),;
         }
         # Ungrouped simple bars
@@ -167,6 +178,7 @@ sub hbar-chart(@data, :@colors, Bool :$stacked, :$style,
             my @bars = gather for @data.kv -> $i, $value {
                 take hbar($value, :$min, :$max, :$width,
                           :lines-every($s.lines-every),
+                          :$bg-color, :$line-color,
                           :color(pick-color(@colors, $i)));
                 last if $i == @data.end;
                 take $blank-line for ^$s.bar-spacing;
